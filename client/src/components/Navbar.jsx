@@ -170,6 +170,41 @@ const Navbar = () => {
         };
     }, [dropDown]);
 
+    const dropDownNavItems = (
+        <>
+            <li>
+                <NavLink
+                    to="/profile"
+                    className={({ isActive }) =>
+                        isActive ? `${active}` : `${inactive}`
+                    }
+                >
+                    My Profile
+                </NavLink>
+            </li>
+            <li>
+                <NavLink
+                    to="/communities/explore"
+                    className={({ isActive }) =>
+                        isActive ? `${active}` : `${inactive}`
+                    }
+                >
+                    Explore
+                </NavLink>
+            </li>
+            <li>
+                <NavLink
+                    to="/communities/my-communities"
+                    className={({ isActive }) =>
+                        isActive ? `${active}` : `${inactive}`
+                    }
+                >
+                    My Communities
+                </NavLink>
+            </li>
+        </>
+    );
+
     const loadingSkeleton = (
         <div className="flex gap-2 items-center animate-pulse">
             <div className="profileImage bg-gray-200 rounded-full h-12 w-12"></div>
@@ -211,51 +246,15 @@ const Navbar = () => {
                         {/* right most element */}
                         <TiThMenu
                             onClick={handleDropDown}
-                            className="lg:hidden flex size-6 text-primary hamburger"
+                            className=" flex size-6 text-primary hamburger"
                         />
                         <div
                             className={`dropdown ${
                                 dropDown ? "flex" : "hidden"
-                            } absolute top-6 right-1 rounded-lg bg-white py-3 px-5 font-medium border border-primary w-44`}
+                            } absolute top-6 right-1 rounded-lg bg-white py-3 px-5 font-medium border border-primary w-56`}
                         >
                             <ul className="flex flex-col gap-3 font-medium text-lg">
-                                {navItems}
-                                {user ? (
-                                    <li
-                                        onClick={handleLogout}
-                                        className="flex gap-2 items-center"
-                                    >
-                                        <IoMdLogOut className="text-primary" />
-                                        Logout
-                                    </li>
-                                ) : (
-                                    <>
-                                        <li>
-                                            <NavLink
-                                                to="/login"
-                                                className={({ isActive }) =>
-                                                    isActive
-                                                        ? `${active}`
-                                                        : `${inactive}`
-                                                }
-                                            >
-                                                Login
-                                            </NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink
-                                                to="/register"
-                                                className={({ isActive }) =>
-                                                    isActive
-                                                        ? `${active}`
-                                                        : `${inactive}`
-                                                }
-                                            >
-                                                Register
-                                            </NavLink>
-                                        </li>
-                                    </>
-                                )}
+                                {dropDownNavItems}
                             </ul>
                         </div>
                     </div>

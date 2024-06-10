@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import { AuthContext } from "../Auth/AuthProvider";
 import ProfileStats from "../components/ProfileStats";
+import { Link } from "react-router-dom";
 
 const Profile = () => {
     const { user } = useContext(AuthContext);
@@ -40,7 +41,7 @@ const Profile = () => {
                         My Drafts
                     </button>
                     <button className="bg-primary text-white px-5 py-2 rounded-lg ml-5 hover:bg-accent">
-                        My Communities
+                        <Link to="/communities/my-communities">My Communities</Link>
                     </button>
                 </div>
             </div>

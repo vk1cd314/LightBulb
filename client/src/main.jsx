@@ -11,6 +11,8 @@ import ErrorPage from "./components/ErrorPage";
 import PrivateRoute from "./Auth/PrivateRoute";
 import Settings from "./pages/Settings";
 import Profile from "./pages/Profile";
+import Communities from "./pages/Communities";
+import CreateCommunity from './components/Communities/CreateCommunity';
 
 const router = createBrowserRouter([
     {
@@ -40,7 +42,17 @@ const router = createBrowserRouter([
             },
             {
                 path: "/communities",
-                element: <div className="mt-20">Communities</div>,
+                element: <Communities />,
+                children: [
+                    {
+                        path: "/communities/explore",
+                        element: <div>Communities</div>,
+                    },
+                    {
+                        path: "/communities/my-communities",
+                        element: <div>Community</div>,
+                    },
+                ],
             },
             {
                 path: "/settings",
@@ -53,7 +65,11 @@ const router = createBrowserRouter([
             {
                 path: "/profile",
                 element: <Profile />,
-            }
+            },
+            {
+                path: "/create-community",
+                element: <CreateCommunity />,
+            },
         ],
     },
 ]);
