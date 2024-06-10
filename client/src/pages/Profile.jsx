@@ -40,9 +40,9 @@ const Profile = () => {
                     <button className="bg-primary text-white px-5 py-2 rounded-lg hover:bg-accent">
                         My Drafts
                     </button>
-                    <button className="bg-primary text-white px-5 py-2 rounded-lg ml-5 hover:bg-accent">
-                        <Link to="/communities/my-communities">My Communities</Link>
-                    </button>
+                    <Link to="/communities/my-communities" className="bg-primary text-white px-5 py-2 rounded-lg ml-5 hover:bg-accent">
+                        My Communities
+                    </Link>
                 </div>
             </div>
         </div>

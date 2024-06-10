@@ -1,10 +1,10 @@
 import { useContext } from "react";
 import { AuthContext } from "../Auth/AuthProvider";
-import { MessageContext } from "./Root";
+// import { MessageContext } from "./Root";
 
 const Settings = () => {
     const { user } = useContext(AuthContext);
-    const { notifySuccess, notifyError } = useContext(MessageContext); //use to notify user of success or error
+    // const { notifySuccess, notifyError } = useContext(MessageContext); //use to notify user of success or error
     const handleSubmit = (e) => {
         e.preventDefault();
         //get form details
