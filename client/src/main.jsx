@@ -9,6 +9,8 @@ import AuthProvider from "./Auth/AuthProvider";
 import Register from "./pages/Register";
 import ErrorPage from "./components/ErrorPage";
 import PrivateRoute from "./Auth/PrivateRoute";
+import Settings from "./pages/Settings";
+import Profile from "./pages/Profile";
 
 const router = createBrowserRouter([
     {
@@ -44,10 +46,14 @@ const router = createBrowserRouter([
                 path: "/settings",
                 element: (
                     <PrivateRoute>
-                        <div className="mt-20">Settings</div>
+                        <Settings />
                     </PrivateRoute>
                 ),
             },
+            {
+                path: "/profile",
+                element: <Profile />,
+            }
         ],
     },
 ]);

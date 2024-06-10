@@ -8,8 +8,8 @@ export default {
     extend: {
       colors: {
         primary: "#080808",
-        accent: "#cbc2d1",
-        secondary: "#f8f5fa",
+        accent: "#5922CF",
+        secondary: "#fff5fa",
     },
     fontFamily: {
         

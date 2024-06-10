@@ -1,10 +1,10 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { FaGoogle } from "react-icons/fa";
 import { AuthContext } from "../Auth/AuthProvider";
 import { useContext, useEffect, useState } from "react";
 import { MessageContext } from "./Root";
 import PasswordInput from "../components/FunctionalComponents/PasswordInput";
 import Loader from "../components/FunctionalComponents/Loader";
+import { FcGoogle } from "react-icons/fc";
 
 const Login = () => {
     const { user, login, googleLogin, loading } = useContext(AuthContext);
@@ -67,7 +67,7 @@ const Login = () => {
 
     return (
         <section className="w-full flex items-center justify-center mt-20">
-            <div className="bg-secondary animate__animated animate__fadeIn xl:mx-auto xl:w-full custom-shadow p-4 xl:max-w-sm 2xl:max-w-md rounded-lg border-8 border-accent mx-3 mt-8">
+            <div className="bg-white animate__animated animate__fadeIn xl:mx-auto xl:w-full custom-shadow p-4 xl:max-w-sm 2xl:max-w-md rounded-lg border-8 border-black mx-3 mt-8">
                 <h2 className="text-center text-2xl font-bold leading-tight text-black">
                     Sign in to your account
                 </h2>
@@ -117,7 +117,7 @@ const Login = () => {
                         </div>
                         <div>
                             <button
-                                className="inline-flex w-full items-center justify-center rounded-md bg-black px-3.5 py-2.5 font-semibold leading-7 text-accent hover:bg-black/80"
+                                className="inline-flex w-full items-center justify-center rounded-md bg-black px-3.5 py-2.5 font-semibold leading-7 text-white hover:bg-accent"
                                 type="submit"
                             >
                                 Login
@@ -131,12 +131,12 @@ const Login = () => {
                     <hr className="flex-grow my-4 border-gray-300" />
                 </div>
                 <button
-                    className="relative inline-flex w-full items-center justify-center rounded-md border border-secondary bg-primary px-3.5 py-2.5 font-semibold text-accent transition-all duration-200 hover:bg-accent hover:text-black focus:bg-gray-100 focus:text-black focus:outline-none"
+                    className="relative inline-flex w-full items-center justify-center rounded-md border border-secondary bg-primary px-3.5 py-2.5 font-semibold text-white transition-all duration-200 hover:bg-accent focus:bg-gray-100focus:outline-none"
                     type="button"
                     onClick={handleGoogleLogin}
                 >
                     <span className="mr-2 inline-block">
-                        <FaGoogle className="h-6 w-6" />
+                        <FcGoogle  className="h-6 w-6" />
                     </span>
                     Sign in with Google
                 </button>
