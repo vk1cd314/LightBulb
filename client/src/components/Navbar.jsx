@@ -1,5 +1,5 @@
 import { Link, NavLink } from "react-router-dom";
-import { FaUserAstronaut } from "react-icons/fa6";
+import { FaMagnifyingGlass, FaUserAstronaut } from "react-icons/fa6";
 import { AuthContext } from "../Auth/AuthProvider";
 import { useContext, useEffect, useState } from "react";
 import { MessageContext } from "../pages/Root";
@@ -7,8 +7,8 @@ import { IoMdLogOut } from "react-icons/io";
 import { TiThMenu } from "react-icons/ti";
 
 const Navbar = () => {
-    const active = "text-primary";
-    const inactive = "hover:text-primary";
+    const active = "text-accent";
+    const inactive = "hover:text-accent";
     const { user, logout, loading } = useContext(AuthContext);
     const { notifySuccess, notifyError } = useContext(MessageContext);
 
@@ -76,6 +76,13 @@ const Navbar = () => {
         }
     };
 
+    const [search, setSearch] = useState("");
+
+    const handleSearch = () => {
+        // Search functionality
+        console.log(search);
+    };
+
     /**
      * Represents the logged out state of the Navbar component.
      * @type {JSX.Element}
@@ -112,19 +119,20 @@ const Navbar = () => {
     const loggedInState = (
         <>
             <div className="flex gap-2 items-center">
-                <a className="profileImage">
+                <Link className="profileImage" to="/profile">
                     <img
                         className="size-12 rounded-full"
                         src={user?.photoURL}
                         alt=""
+                        title="View Profile"
                     />
-                </a>
+                </Link>
 
                 <button
                     onClick={handleLogout}
                     className="lg:py-2 lg:px-3 rounded-full bg-primary text-primary bg-opacity-20 border-primary border-2 hidden lg:flex items-center gap-2"
                 >
-                    <IoMdLogOut className="size-6" /> Logout
+                    <IoMdLogOut className="size-6" />
                 </button>
             </div>
         </>
@@ -162,6 +170,41 @@ const Navbar = () => {
         };
     }, [dropDown]);
 
+    const dropDownNavItems = (
+        <>
+            <li>
+                <NavLink
+                    to="/profile"
+                    className={({ isActive }) =>
+                        isActive ? `${active}` : `${inactive}`
+                    }
+                >
+                    My Profile
+                </NavLink>
+            </li>
+            <li>
+                <NavLink
+                    to="/communities/explore"
+                    className={({ isActive }) =>
+                        isActive ? `${active}` : `${inactive}`
+                    }
+                >
+                    Explore
+                </NavLink>
+            </li>
+            <li>
+                <NavLink
+                    to="/communities/my-communities"
+                    className={({ isActive }) =>
+                        isActive ? `${active}` : `${inactive}`
+                    }
+                >
+                    My Communities
+                </NavLink>
+            </li>
+        </>
+    );
+
     const loadingSkeleton = (
         <div className="flex gap-2 items-center animate-pulse">
             <div className="profileImage bg-gray-200 rounded-full h-12 w-12"></div>
@@ -174,13 +217,25 @@ const Navbar = () => {
 
     return (
         <>
-            <div className="glass fixed w-full top-0 z-50 custom-shadow">
+            <div className="glass fixed w-full top-0 z-50 custom-shadow nav-glass">
                 <nav className="lg:px-5 px-3 py-2 flex justify-between text-sm items-center lg:text-lg font-extrabold">
                     <Link to="/" className="flex items-center gap-2 text-4xl">
                         LightBulb
                     </Link>
                     {/* large screen nav items */}
-                    <ul className="hidden lg:flex gap-4">{navItems}</ul>{" "}
+                    <ul className="hidden font-bold lg:flex gap-4">{navItems}</ul>{" "}
+                    {/* search bar */}
+                    <div className="lg:flex items-center font-medium gap-3">
+                        <input
+                            type="text"
+                            placeholder="Search"
+                            onChange={(e) => setSearch(e.target.value)}
+                            className="rounded-lg border border-primary bg-transparent px-3 py-2 text-sm"
+                        />
+                        <button onClick={handleSearch} className="bg-primary text-white rounded-lg px-3 py-2">
+                        <FaMagnifyingGlass />
+                        </button>
+                    </div>
                     {/* small screen nav items */}
                     <div className="flex items-center gap-3 relative">
                         {loading
@@ -191,51 +246,15 @@ const Navbar = () => {
                         {/* right most element */}
                         <TiThMenu
                             onClick={handleDropDown}
-                            className="lg:hidden flex size-6 text-primary hamburger"
+                            className=" flex size-6 text-primary hamburger"
                         />
                         <div
                             className={`dropdown ${
                                 dropDown ? "flex" : "hidden"
-                            } absolute top-6 right-1 rounded-lg bg-white py-3 px-5 font-medium border border-primary w-44`}
+                            } absolute top-6 right-1 rounded-lg bg-white py-3 px-5 font-medium border border-primary w-56`}
                         >
                             <ul className="flex flex-col gap-3 font-medium text-lg">
-                                {navItems}
-                                {user ? (
-                                    <li
-                                        onClick={handleLogout}
-                                        className="flex gap-2 items-center"
-                                    >
-                                        <IoMdLogOut className="text-primary" />
-                                        Logout
-                                    </li>
-                                ) : (
-                                    <>
-                                        <li>
-                                            <NavLink
-                                                to="/login"
-                                                className={({ isActive }) =>
-                                                    isActive
-                                                        ? `${active}`
-                                                        : `${inactive}`
-                                                }
-                                            >
-                                                Login
-                                            </NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink
-                                                to="/register"
-                                                className={({ isActive }) =>
-                                                    isActive
-                                                        ? `${active}`
-                                                        : `${inactive}`
-                                                }
-                                            >
-                                                Register
-                                            </NavLink>
-                                        </li>
-                                    </>
-                                )}
+                                {dropDownNavItems}
                             </ul>
                         </div>
                     </div>
