@@ -64,11 +64,11 @@ const router = createBrowserRouter([
             },
             {
                 path: "/profile",
-                element: <Profile />,
+                element: <PrivateRoute><Profile /></PrivateRoute>,
             },
             {
                 path: "/create-community",
-                element: <CreateCommunity />,
+                element: <PrivateRoute><CreateCommunity /></PrivateRoute>,
             },
         ],
     },

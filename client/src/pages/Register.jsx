@@ -5,6 +5,7 @@ import { MessageContext } from "./Root";
 import PasswordInput from "../components/FunctionalComponents/PasswordInput";
 import Loader from "../components/FunctionalComponents/Loader";
 import { FcGoogle } from "react-icons/fc";
+import useAxiosSecure from "../hooks/useAxiosSecure";
 
 const Register = () => {
     const {
@@ -21,6 +22,8 @@ const Register = () => {
 
     const [password, setPassword] = useState("");
     const [confirmation, setConfirmation] = useState("");
+    
+    const axiosSecure = useAxiosSecure();
 
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -62,8 +65,10 @@ const Register = () => {
             return;
         }
 
+
         try {
             await createUser(email, passwordValue);
+            // If createUser is successful, then post to the backend
         } catch (error) {
             if (error.code === "auth/email-already-in-use") {
                 notifyError("Email already in use");
@@ -73,6 +78,21 @@ const Register = () => {
                 return;
             }
         }
+        
+        // Post to the backend
+        axiosSecure
+            .post("/users", {
+                email: email,
+                username: username,
+                name: name,
+            })
+            .then((response) => {
+                console.log(response);
+            })
+            .catch((error) => {
+                console.log(error);
+                notifyError("An error occurred. Please try again later.");
+            });
 
         await updateUserProfile(user, name, "https://i.ibb.co/hYbbGyR/6596121-modified.png")
             .then(() => {
