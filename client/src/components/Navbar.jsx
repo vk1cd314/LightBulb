@@ -26,7 +26,7 @@ const Navbar = () => {
             </li>
             <li>
                 <NavLink
-                    to="/blog"
+                    to="/blogs"
                     className={({ isActive }) =>
                         isActive ? `${active}` : `${inactive}`
                     }
@@ -189,7 +189,7 @@ const Navbar = () => {
                         isActive ? `${active}` : `${inactive}`
                     }
                 >
-                    Explore
+                    Explore Communities
                 </NavLink>
             </li>
             <li>
@@ -200,6 +200,26 @@ const Navbar = () => {
                     }
                 >
                     My Communities
+                </NavLink>
+            </li>
+            <li>
+                <NavLink
+                    to="/blogs/explore"
+                    className={({ isActive }) =>
+                        isActive ? `${active}` : `${inactive}`
+                    }
+                >
+                    Explore Blogs
+                </NavLink>
+            </li>
+            <li>
+                <NavLink
+                    to="/blogs/my-blogs"
+                    className={({ isActive }) =>
+                        isActive ? `${active}` : `${inactive}`
+                    }
+                >
+                    My Blogs
                 </NavLink>
             </li>
         </>

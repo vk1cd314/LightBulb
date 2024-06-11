@@ -13,6 +13,11 @@ import Settings from "./pages/Settings";
 import Profile from "./pages/Profile";
 import Communities from "./pages/Communities";
 import CreateCommunity from './components/Communities/CreateCommunity';
+import Blogs from "./pages/Blogs";
+import ExploreCommunities from "./components/Communities/ExploreCommunities";
+import MyCommunities from "./components/Communities/MyCommunities";
+import CreatePost from "./components/CreateBlog";
+import CreateBlog from "./components/CreateBlog";
 
 const router = createBrowserRouter([
     {
@@ -33,8 +38,22 @@ const router = createBrowserRouter([
                 element: <Register />,
             },
             {
-                path: "/blog",
-                element: <div className="mt-20">Blog</div>,
+                path: "/blogs",
+                element: <Blogs></Blogs>,
+                children: [
+                    {
+                        path: "/blogs/explore",
+                        element: <div>Explore Blogs</div>,
+                    },
+                    {
+                        path: "/blogs/my-blogs",
+                        element: <div>My Blogs</div>,
+                    }
+                ]
+            },
+            {
+                path: "/create-blog",
+                element: <CreateBlog></CreateBlog>,
             },
             {
                 path: "/notifications",
@@ -46,11 +65,11 @@ const router = createBrowserRouter([
                 children: [
                     {
                         path: "/communities/explore",
-                        element: <div>Communities</div>,
+                        element: <ExploreCommunities />,
                     },
                     {
                         path: "/communities/my-communities",
-                        element: <div>Community</div>,
+                        element: <MyCommunities/>,
                     },
                 ],
             },
@@ -70,6 +89,10 @@ const router = createBrowserRouter([
                 path: "/create-community",
                 element: <PrivateRoute><CreateCommunity /></PrivateRoute>,
             },
+            {
+                path: "/create-post",
+                element: <PrivateRoute><CreatePost/></PrivateRoute>,
+            }
         ],
     },
 ]);
