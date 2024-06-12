@@ -6,6 +6,11 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from bson import ObjectId
 from typing import List
 from models.models import *
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env file
+load_dotenv()
 
 
 app = FastAPI()
@@ -29,7 +34,7 @@ app.add_middleware(
 async def read_root() -> dict:
     return {"Welcome to LightBulb"}
 
-uri = "mongodb+srv://drakensang47:zuECudUoeKqIN4Qw@lightbulb.7mvqrxi.mongodb.net/?retryWrites=true&w=majority&appName=LightBulb"
+uri = os.getenv("MONGODB_URI")
 
 # Create a new client and connect to the server
 client = AsyncIOMotorClient(uri)
