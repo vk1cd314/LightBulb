@@ -16,7 +16,7 @@
     margin: 0 0;
 }
 
-button{
+.tiptap button{
     font-family: 'Roboto', sans-serif;
     font-size: 16px;
     padding: 2px 8px;
@@ -30,6 +30,6 @@ button{
     transition: background-color 0.2s;
 }
 
-button:hover{
+.tiptap button:hover{
     background-color: #5922CF;
 }

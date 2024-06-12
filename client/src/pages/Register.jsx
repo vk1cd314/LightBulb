@@ -47,7 +47,7 @@ const Register = () => {
         const formData = new FormData(e.target);
         const name = formData.get("name");
         const email = formData.get("email");
-        let username = formData.get("username");
+        const username = formData.get("username");
         const passwordValue = password;
         const confirmationValue = confirmation;
 
@@ -80,19 +80,27 @@ const Register = () => {
         }
         
         // Post to the backend
-        axiosSecure
-            .post("/users", {
-                email: email,
-                username: username,
-                name: name,
-            })
-            .then((response) => {
-                console.log(response);
+    //     # Create a new user
+    // @app.post("/users/", response_model=User)
+    // async def create_user(user: User, collection=Depends(get_collection('users'))):
+    //     user_dict = user.dict(by_alias=True)
+    //     result = await collection.insert_one(user_dict)
+    //     user_dict["_id"] = result.inserted_id
+    //     return user_dict
+        const user = {
+            name: name,
+            email: email,
+            username: username,
+            photoURL: "https://i.ibb.co/hYbbGyR/6596121-modified.png",
+        };
+
+        axiosSecure.post("/users/", user)
+            .then(() => {
             })
             .catch((error) => {
-                console.log(error);
-                notifyError("An error occurred. Please try again later.");
+                notifyError(error.code);
             });
+
 
         await updateUserProfile(user, name, "https://i.ibb.co/hYbbGyR/6596121-modified.png")
             .then(() => {

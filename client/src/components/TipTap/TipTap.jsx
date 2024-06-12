@@ -180,7 +180,7 @@ import PropTypes from "prop-types";
 
 const Tiptap = ({ setContent, content }) => {
     return (
-        <div className="prose min-w-full">
+        <div className="prose min-w-full tiptap">
             <EditorProvider
                 slotBefore={<MenuBar />}
                 extensions={extensions}
