@@ -175,18 +175,27 @@ const MenuBar = () => {
 // define your extension array
 const extensions = [StarterKit];
 
-const content = "<p>Hello World!</p>";
 
-const Tiptap = () => {
+import PropTypes from "prop-types";
+
+const Tiptap = ({ setContent, content }) => {
     return (
         <div className="prose min-w-full">
             <EditorProvider
                 slotBefore={<MenuBar />}
                 extensions={extensions}
                 content={content}
+                onUpdate={({ editor }) => { 
+                    setContent(editor.getHTML()); // Extract text content and call setContent
+                }}
             ></EditorProvider>
         </div>
     );
+};
+
+Tiptap.propTypes = {
+    setContent: PropTypes.func.isRequired,
+    content: PropTypes.string,
 };
 
 export default Tiptap;

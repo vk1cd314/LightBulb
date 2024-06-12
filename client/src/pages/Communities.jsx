@@ -1,8 +1,12 @@
 import { Link, NavLink } from "react-router-dom";
 
+
 const Communities = () => {
     const active = "text-accent border-b-[3px] border-accent";
     const inactive = "hover:text-accent border-b-[3px] border-transparent";
+
+
+
 
     return (
         <div className="mt-20 max-w-6xl mx-auto">

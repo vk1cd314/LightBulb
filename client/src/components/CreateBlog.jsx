@@ -1,11 +1,26 @@
 import { useState } from "react";
-import TipTapEditor from "./TipTap/TipTap";
+import Tiptap from "./TipTap/TipTap";
 
 const CreateBlog = () => {
     const [content, setContent] = useState("");
+
+    const handlePublish = () => {
+        // publish to db
+        console.log(content);
+    };
+
     return (
         <div className="min-h-dvh mt-32 max-w-5xl mx-auto">
-           <TipTapEditor />
+            <Tiptap setContent={setContent} />
+            <div className="mt-10 text-end">
+                <button className="btn-primary px-3 py-2 rounded-lg" onClick={handlePublish}>Publish</button>
+            </div>
+
+            <p className="font-bold text-xl my-10">Preview:</p>
+            <div
+                className="prose"
+                dangerouslySetInnerHTML={{ __html: content }}
+            />
         </div>
     );
 };
