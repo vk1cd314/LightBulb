@@ -26,7 +26,7 @@ const Navbar = () => {
             </li>
             <li>
                 <NavLink
-                    to="/blogs"
+                    to="/blogs/explore"
                     className={({ isActive }) =>
                         isActive ? `${active}` : `${inactive}`
                     }

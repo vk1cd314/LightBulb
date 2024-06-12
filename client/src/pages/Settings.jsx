@@ -22,7 +22,7 @@ const Settings = () => {
         <div className="h-dvh flex items-center max-w-5xl mx-auto ">
             <form onSubmit={handleSubmit} className="space-y-4 flex justify-center flex-col">
                 <div className="flex gap-20">
-                    <div className="flex flex-col">
+                    <div className="flex flex-col space-y-4">
                         <p className="text-xl font-bold">Email Addres</p>
                         <p className="text-lg px-3 py-2 bg-gray-200 w-fit rounded-lg">
                             {user?.email}
@@ -59,8 +59,35 @@ const Settings = () => {
                                 className="border border-gray-200 px-3 py-2 rounded-lg max-w-72"
                             />
                         </div>
+                        <div className="space-y-2">
+                            <p className="text-xl font-bold">username</p>
+                            <p className="text-sm">
+                                Set a username. This is unique to you.
+                            </p>
+                            <input
+                                type="text"
+                                name="username"
+                                defaultValue={user?.displayName}
+                                className="border border-gray-200 px-3 py-2 rounded-lg max-w-72"
+                            />
+                        </div>
                     </div>
                     <div className="space-y-2">
+                        {/* set profile picture */}
+                        <div className="flex flex-col items-center justify-center">
+                            <img
+                                src={user?.photoURL}
+                                alt="profile"
+                                className="rounded-full w-32 h-32"
+                            />
+                            {/* take direct image url for profile picture */}
+                            <input
+                                type="text"
+                                name="profilePicture"
+                                placeholder="https://i.ibb.co/your-image-url.jpg"
+                                className="border border-gray-200 px-3 py-2 rounded-lg w-full  mt-5"
+                            />
+                        </div>
                         <p className="text-xl font-bold">About</p>
                         <p className="text-sm">
                             A brief description of yourself shown on your profile.
@@ -68,7 +95,8 @@ const Settings = () => {
                         <textarea
                             type="text"
                             name="about"
-                            className="border border-gray-200 px-3 py-2 rounded-lg min-w-[450px] min-h-60"
+                            placeholder="About you"
+                            className="border border-gray-200 px-3 py-2 rounded-lg min-w-[450px]"
                         />
                     </div>
                 </div>

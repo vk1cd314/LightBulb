@@ -1,4 +1,4 @@
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, Outlet } from "react-router-dom";
 
 
 const Communities = () => {
@@ -36,6 +36,7 @@ const Communities = () => {
                         </NavLink>
                     </li>
                 </ul>
+                <Outlet />
             </div>
         </div>
     );
