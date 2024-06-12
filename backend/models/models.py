@@ -17,8 +17,8 @@ class User(BaseModel):
     uid: Optional[PyObjectId] = Field(alias="_id")
     name: str
     email: EmailStr
-    gender: str
-    password: str
+    gender: Optional[str] = None
+    username: Optional[str] = None
     profilepic: Optional[str] = None
     followercount: int = 0
 

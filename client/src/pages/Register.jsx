@@ -91,7 +91,7 @@ const Register = () => {
             name: name,
             email: email,
             username: username,
-            photoURL: "https://i.ibb.co/hYbbGyR/6596121-modified.png",
+            profilepic: "https://i.ibb.co/hYbbGyR/6596121-modified.png",
         };
 
         axiosSecure.post("/users/", user)
