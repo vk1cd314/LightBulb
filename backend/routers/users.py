@@ -14,6 +14,7 @@ async def create_user(user: User, collection=Depends(get_users_collection)):
     user_dict = user.dict(by_alias=True)
     result = await collection.insert_one(user_dict)
     user_dict["_id"] = result.inserted_id
+    print("Done Posting")
     return user_dict
 
 @router.get("/{user_id}", response_model=User)
