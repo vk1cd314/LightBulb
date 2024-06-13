@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, Field, EmailStr, validator
 from typing import List, Optional
 from bson import ObjectId
 
@@ -11,7 +11,11 @@ class PyObjectId(ObjectId):
     def validate(cls, v):
         if not ObjectId.is_valid(v):
             raise ValueError("Invalid ObjectId")
-        return ObjectId(v)
+        return cls(v)  # <-- Return an instance of PyObjectId
+
+    @classmethod
+    def __get_pydantic_field_info__(cls):
+        return {"type": "string"}
 
 class User(BaseModel):
     uid: Optional[PyObjectId] = Field(alias="_id")
@@ -23,7 +27,7 @@ class User(BaseModel):
     followercount: int = 0
 
     class Config:
-        allow_population_by_field_name = True
+        populate_by_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
 
@@ -34,7 +38,7 @@ class Community(BaseModel):
     memberlist: List[PyObjectId] = []
 
     class Config:
-        allow_population_by_field_name = True
+        populate_by_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
 
@@ -45,7 +49,7 @@ class Blog(BaseModel):
     content: str
 
     class Config:
-        allow_population_by_field_name = True
+        populate_by_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
 
