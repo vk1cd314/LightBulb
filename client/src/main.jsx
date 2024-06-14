@@ -16,8 +16,8 @@ import CreateCommunity from './components/Communities/CreateCommunity';
 import Blogs from "./pages/Blogs";
 import ExploreCommunities from "./components/Communities/ExploreCommunities";
 import MyCommunities from "./components/Communities/MyCommunities";
-import CreatePost from "./components/CreateBlog";
-import CreateBlog from "./components/CreateBlog";
+import CreatePost from "./components/Blogs/CreateBlog";
+import CreateBlog from "./components/Blogs/CreateBlog";
 import AllBlogsCards from "./components/Blogs/AllBlogsCards";
 import Home from "./pages/Home";
 

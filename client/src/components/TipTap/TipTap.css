@@ -17,17 +17,16 @@
 }
 
 .tiptap button{
-    font-family: 'Roboto', sans-serif;
     font-size: 16px;
     padding: 2px 8px;
-    border: none;
-    border-radius: 50px;
-    background-color: #000000;
+    border-width: 1px;
+    border-color: black;
     /* capitalise */
     text-transform: capitalize;
-    color: #fff;
+    color: black;
     cursor: pointer;
     transition: background-color 0.2s;
+    font-size: 20px;
 }
 
 .tiptap button:hover{

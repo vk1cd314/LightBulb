@@ -25,7 +25,7 @@ const Home = () => {
                         >
                             Explore Blogs
                         </Link>
-                        <Link className="px-5 py-3 bg-primary hover:bg-accent text-white font-bold rounded-lg">
+                        <Link to="/communities/explore" className="px-5 py-3 bg-primary hover:bg-accent text-white font-bold rounded-lg">
                             Explore Communities
                         </Link>
                     </div>
