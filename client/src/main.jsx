@@ -18,6 +18,7 @@ import ExploreCommunities from "./components/Communities/ExploreCommunities";
 import MyCommunities from "./components/Communities/MyCommunities";
 import CreatePost from "./components/CreateBlog";
 import CreateBlog from "./components/CreateBlog";
+import AllBlogsCards from "./components/Blogs/AllBlogsCards";
 
 const router = createBrowserRouter([
     {
@@ -43,11 +44,11 @@ const router = createBrowserRouter([
                 children: [
                     {
                         path: "/blogs/explore",
-                        element: <div>Explore Blogs</div>,
+                        element: <AllBlogsCards></AllBlogsCards>,
                     },
                     {
                         path: "/blogs/my-blogs",
-                        element: <div>My Blogs</div>,
+                        element: <AllBlogsCards></AllBlogsCards>,
                     }
                 ]
             },

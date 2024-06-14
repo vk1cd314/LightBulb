@@ -80,27 +80,26 @@ const Register = () => {
         }
         
         // Post to the backend
-    //     # Create a new user
-    // @app.post("/users/", response_model=User)
-    // async def create_user(user: User, collection=Depends(get_collection('users'))):
-    //     user_dict = user.dict(by_alias=True)
-    //     result = await collection.insert_one(user_dict)
-    //     user_dict["_id"] = result.inserted_id
-    //     return user_dict
+// @app.post("/users/", response_model=User)
+// async def create_user(user: User, collection=Depends(get_collection('users'))):
+// user_dict = user.dict(by_alias=True)
+// result = await collection.insert_one(user_dict)
+// user_dict["_id"] = result.inserted_id
+// return user_dict
         const user = {
-            name: name,
-            email: email,
-            username: username,
-            profilepic: "https://i.ibb.co/hYbbGyR/6596121-modified.png",
-        };
+            "name": name,
+            "email": email,
+            "username": username,
+            "profile_picture": "https://i.ibb.co/hYbbGyR/6596121-modified.png"
+        }
 
         axiosSecure.post("/users/", user)
-            .then(() => {
+            .then((response) => {
+                console.log(response);
             })
             .catch((error) => {
-                notifyError(error.code);
+                console.error(error);
             });
-
 
         await updateUserProfile(user, name, "https://i.ibb.co/hYbbGyR/6596121-modified.png")
             .then(() => {
