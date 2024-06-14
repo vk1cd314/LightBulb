@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import users, communities, blogs # Assuming you have these routers
+from routers import users, communities, blogs, drafts # Assuming you have these routers
 import database  # Ensure this is imported to establish DB connection
 
 app = FastAPI()
@@ -25,6 +25,7 @@ async def read_root() -> dict:
 app.include_router(users.router)
 app.include_router(communities.router)
 app.include_router(blogs.router)
+app.include_router(drafts.router)
 
 if __name__ == "__main__":
     import uvicorn
