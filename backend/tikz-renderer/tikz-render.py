@@ -6,6 +6,9 @@ def compile_tikz_to_jpg(tikz_code, output_file):
     latex_content = (
         "\\documentclass{standalone}\n"
         "\\usepackage{tikz}\n"
+        "\\usepackage{tikz-qtree,tikz-qtree-compat}\n"
+        "\\usepackage{tikz,tikz-3dplot,tikz-cd,tkz-tab,tkz-euclide,pgf,pgfplots}\n"
+        "\\pgfplotsset{compat=newest}\n"
         "\\usetikzlibrary{calc}\n"
         "\\begin{document}\n"
         + tikz_code +
@@ -28,7 +31,7 @@ def compile_tikz_to_jpg(tikz_code, output_file):
         return
     
     pdf_file = "temp_tikz.pdf"
-    convert_command = ["convert", "-density", "300", pdf_file, output_file]
+    convert_command = ["magick", "-density", "1000", pdf_file, output_file]
     try:
         subprocess.check_call(convert_command)
     except subprocess.CalledProcessError as e:
