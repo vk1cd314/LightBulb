@@ -36,6 +36,8 @@ import { CgArrowsBreakeV } from "react-icons/cg";
 import { FaRedo, FaUndo } from "react-icons/fa";
 
 import "./TipTap.css";
+import "katex/dist/katex.min.css";
+import MathExtension from "@aarkue/tiptap-math-extension";
 
 const MenuBar = () => {
     const { editor } = useCurrentEditor();
@@ -276,6 +278,7 @@ const MenuBar = () => {
             >
                 <FaRedo />
             </button>
+            
         </div>
     );
 };
@@ -287,9 +290,8 @@ const extensions = [
         types: ["heading", "paragraph"],
     }),
     Underline,
+    MathExtension.configure({ evaluation: true }),
 ];
-
-
 
 const Tiptap = ({ setContent, content }) => {
     return (

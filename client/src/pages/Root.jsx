@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { createContext } from "react";
 import toast, { Toaster } from "react-hot-toast";
-import Navbar from "../components/Navbar";
+import Navbar from "../components/Shared/Navbar";
 
 const MessageContext = createContext();
 

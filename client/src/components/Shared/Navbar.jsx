@@ -1,8 +1,8 @@
 import { Link, NavLink } from "react-router-dom";
 import { FaMagnifyingGlass, FaUserAstronaut } from "react-icons/fa6";
-import { AuthContext } from "../Auth/AuthProvider";
+import { AuthContext } from "../../Auth/AuthProvider";
 import { useContext, useEffect, useState } from "react";
-import { MessageContext } from "../pages/Root";
+import { MessageContext } from "../../pages/Root";
 import { IoMdLogOut } from "react-icons/io";
 import { TiThMenu } from "react-icons/ti";
 
