@@ -1,9 +1,9 @@
-from pydantic import BaseModel, Field, EmailStr, validator
+from pydantic import BaseModel, Field, EmailStr
 from typing import List, Optional
 from bson import ObjectId
 
 class User(BaseModel):
-    uid: Optional[str] = Field(alias="_id")
+    uid: Optional[str] = Field(default_factory=lambda: str(ObjectId()), alias="_id")
     name: str
     email: EmailStr
     gender: Optional[str] = None
@@ -16,7 +16,7 @@ class User(BaseModel):
         json_encoders = {ObjectId: str}
 
 class Community(BaseModel):
-    commid: Optional[str] = Field(alias="_id")
+    commid: Optional[str] = Field(default_factory=lambda: str(ObjectId()), alias="_id")
     name: str
     topic: str
     memberlist: List[str] = []
@@ -27,7 +27,7 @@ class Community(BaseModel):
         json_encoders = {ObjectId: str}
 
 class Blog(BaseModel):
-    blogid: Optional[str] = Field(alias="_id")
+    blogid: Optional[str] = Field(default_factory=lambda: str(ObjectId()), alias="_id")
     uid: str
     commid: Optional[str] = None
     content: str
@@ -48,7 +48,7 @@ class Following(BaseModel):
         json_encoders = {ObjectId: str}
 
 class Like(BaseModel):
-    lid: Optional[str] = Field(alias="_id")
+    lid: Optional[str] = Field(default_factory=lambda: str(ObjectId()), alias="_id")
     uid: str
     blogid: str
 
@@ -57,7 +57,7 @@ class Like(BaseModel):
         json_encoders = {ObjectId: str}
 
 class Comment(BaseModel):
-    cid: Optional[str] = Field(alias="_id")
+    cid: Optional[str] = Field(default_factory=lambda: str(ObjectId()), alias="_id")
     uid: str
     blogid: str
     commid: Optional[str] = None
