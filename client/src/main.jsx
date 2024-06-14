@@ -19,6 +19,7 @@ import MyCommunities from "./components/Communities/MyCommunities";
 import CreatePost from "./components/CreateBlog";
 import CreateBlog from "./components/CreateBlog";
 import AllBlogsCards from "./components/Blogs/AllBlogsCards";
+import Home from "./pages/Home";
 
 const router = createBrowserRouter([
     {
@@ -28,7 +29,7 @@ const router = createBrowserRouter([
         children: [
             {
                 path: "/",
-                element: <div className="mt-20">Landing page</div>,
+                element: <Home />,
             },
             {
                 path: "/login",

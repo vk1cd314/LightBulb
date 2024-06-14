@@ -166,7 +166,7 @@ const MenuBar = () => {
                         : ""
                 }
             >
-                purple
+                Paragraph
             </button>
         </div>
     );
