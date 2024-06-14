@@ -61,6 +61,10 @@ const CreateBlog = () => {
                 </button>
             </div>
 
+            <p className="font-bold text-xl mt-10">Raw:</p>
+            <p
+                className="max-w-5xl p-5 border-2 border-gray-200 w-full rounded-lg mt-5 mb-20"
+            >{content}</p>
             <p className="font-bold text-xl mt-10">Preview:</p>
             <div
                 className="prose max-w-5xl p-5 border-2 border-gray-200 w-full rounded-lg mt-5 mb-20"

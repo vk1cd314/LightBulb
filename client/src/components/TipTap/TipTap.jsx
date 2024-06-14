@@ -290,7 +290,7 @@ const extensions = [
         types: ["heading", "paragraph"],
     }),
     Underline,
-    MathExtension.configure({ evaluation: true }),
+    MathExtension.configure(),
 ];
 
 const Tiptap = ({ setContent, content }) => {
