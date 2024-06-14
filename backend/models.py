@@ -9,7 +9,6 @@ class User(BaseModel):
     gender: Optional[str] = None
     username: Optional[str] = None
     profilepic: Optional[str] = None
-    followercount: int = 0
 
     class Config:
         populate_by_name = True
@@ -32,6 +31,8 @@ class Blog(BaseModel):
     uid: str
     commid: Optional[str] = None
     content: str
+    comments: Optional[str] = None
+    likes: Optional[str] = None
 
     class Config:
         populate_by_name = True
@@ -47,6 +48,7 @@ class Following(BaseModel):
         json_encoders = {ObjectId: str}
 
 class Like(BaseModel):
+    lid: Optional[str] = Field(alias="_id")
     uid: str
     blogid: str
 
@@ -55,6 +57,7 @@ class Like(BaseModel):
         json_encoders = {ObjectId: str}
 
 class Comment(BaseModel):
+    cid: Optional[str] = Field(alias="_id")
     uid: str
     blogid: str
     commid: Optional[str] = None

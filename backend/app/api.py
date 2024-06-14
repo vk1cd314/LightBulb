@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from bson import ObjectId
 from typing import List
-from models import User, Community
+from backend.models import User, Community
 from dotenv import load_dotenv
 import os
 
