@@ -1,8 +1,39 @@
-// src/Tiptap.jsx
 import { EditorProvider, useCurrentEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import TextAlign from "@tiptap/extension-text-align";
 import Underline from "@tiptap/extension-underline";
+import PropTypes from "prop-types";
+import {
+    FaAlignCenter,
+    FaAlignJustify,
+    FaAlignLeft,
+    FaAlignRight,
+    FaBold,
+    FaCode,
+    FaItalic,
+    FaParagraph,
+    FaStrikethrough,
+    FaUnderline,
+} from "react-icons/fa6";
+import {
+    MdFormatClear,
+    MdFormatListBulleted,
+    MdHorizontalRule,
+    MdOutlineClearAll,
+} from "react-icons/md";
+import {
+    LuHeading1,
+    LuHeading2,
+    LuHeading3,
+    LuHeading4,
+    LuHeading5,
+    LuHeading6,
+} from "react-icons/lu";
+import { RiListOrdered } from "react-icons/ri";
+import { AiOutlineCode } from "react-icons/ai";
+import { BsBlockquoteLeft } from "react-icons/bs";
+import { CgArrowsBreakeV } from "react-icons/cg";
+import { FaRedo, FaUndo } from "react-icons/fa";
 
 import "./TipTap.css";
 
@@ -258,38 +289,7 @@ const extensions = [
     Underline,
 ];
 
-import PropTypes from "prop-types";
-import {
-    FaAlignCenter,
-    FaAlignJustify,
-    FaAlignLeft,
-    FaAlignRight,
-    FaBold,
-    FaCode,
-    FaItalic,
-    FaParagraph,
-    FaStrikethrough,
-    FaUnderline,
-} from "react-icons/fa6";
-import {
-    MdFormatClear,
-    MdFormatListBulleted,
-    MdHorizontalRule,
-    MdOutlineClearAll,
-} from "react-icons/md";
-import {
-    LuHeading1,
-    LuHeading2,
-    LuHeading3,
-    LuHeading4,
-    LuHeading5,
-    LuHeading6,
-} from "react-icons/lu";
-import { RiListOrdered } from "react-icons/ri";
-import { AiOutlineCode } from "react-icons/ai";
-import { BsBlockquoteLeft } from "react-icons/bs";
-import { CgArrowsBreakeV } from "react-icons/cg";
-import { FaRedo, FaUndo } from "react-icons/fa";
+
 
 const Tiptap = ({ setContent, content }) => {
     return (

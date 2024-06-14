@@ -3,7 +3,7 @@ import Tiptap from "../TipTap/TipTap";
 
 const CreateBlog = () => {
     const [content, setContent] = useState("");
-    const [title, setTitle] = useState("");
+    const [, setTitle] = useState("");
 
     const handlePublish = () => {
         // publish to db

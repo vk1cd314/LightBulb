@@ -1,10 +1,10 @@
 import { useLocation } from "react-router-dom";
-import BlogCard from "./BlogCard";
-import { useEffect, useState } from "react";
+import HeaderCard from "../Shared/HeaderCard";
+import { useEffect,  } from "react";
 
 const AllBlogsCards = () => {
     const location = useLocation();
-    const [blogs, setBlogs] = useState([]);
+    // const [blogs, setBlogs] = useState([]);
 
     useEffect(() => {
         if (location.pathname === "/blogs/explore") {
@@ -17,11 +17,9 @@ const AllBlogsCards = () => {
     }, [location]);
     return (
         <div className="flex flex-col items-center mt-10 space-y-3">
-            <BlogCard/>
-            <BlogCard/>
-            <BlogCard/>
-            <BlogCard/>
-            <BlogCard/>
+            <HeaderCard/>
+            <HeaderCard/>
+            <HeaderCard/>
         </div>
     );
 };

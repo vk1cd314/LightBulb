@@ -1,7 +1,7 @@
 import { BiComment } from "react-icons/bi";
 import { FaThumbsUp } from "react-icons/fa6";
 
-const BlogCard = () => {
+const HeaderCard = () => {
     return (
         <div className="flex flex-col max-w-4xl p-5 border-2 border-gray-200 w-full space-y-4 rounded-lg">
             <div className="flex items-center justify-between">
@@ -35,4 +35,4 @@ const BlogCard = () => {
     );
 };
 
-export default BlogCard;
+export default HeaderCard;
