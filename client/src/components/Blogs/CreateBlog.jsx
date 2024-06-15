@@ -5,6 +5,8 @@ import katex from "katex";
 const CreateBlog = () => {
     const [content, setContent] = useState("");
     const [title, setTitle] = useState("");
+    const [preview, setPreview] = useState("");
+    const [tikzPicture, setTikzPicture] = useState("");
 
     const handlePublish = () => {
         // publish to db
@@ -38,6 +40,20 @@ const CreateBlog = () => {
         return html;
     };
 
+
+
+    const handlePreview = () => {
+        setPreview(renderLatex(content));
+        const tikzPictureRegex = /\\begin{tikzpicture}(.*?)\\end{tikzpicture}/gs; // Regular expression to match TikZ pictures
+
+
+        const tikzPictures = content.match(tikzPictureRegex);
+        setTikzPicture(tikzPictures);
+        // setPreview(tikzPictures);
+    };
+
+
+
     return (
         <div className="min-h-dvh mt-32 max-w-5xl mx-auto">
             {/* blog title input */}
@@ -54,6 +70,12 @@ const CreateBlog = () => {
             <Tiptap setContent={setContent} content={content} />
             <div className="mt-10 text-end">
                 <button
+                    className="px-3 py-2 bg-accent text-white font-bold w-fit rounded-full mr-5"
+                    onClick={handlePreview}
+                >
+                    Preview
+                </button>
+                <button
                     className="px-3 py-2 bg-accent text-white font-bold w-fit rounded-full"
                     onClick={handlePublish}
                 >
@@ -68,7 +90,7 @@ const CreateBlog = () => {
             <p className="font-bold text-xl mt-10">Preview:</p>
             <div
                 className="prose max-w-5xl p-5 border-2 border-gray-200 w-full rounded-lg mt-5 mb-20"
-                dangerouslySetInnerHTML={{ __html: renderLatex(content) }}
+                dangerouslySetInnerHTML={{ __html: preview }}
             />
         </div>
     );

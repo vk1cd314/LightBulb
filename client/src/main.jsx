@@ -21,6 +21,8 @@ import CreateBlog from "./components/Blogs/CreateBlog";
 import AllBlogsCards from "./components/Blogs/AllBlogsCards";
 import Home from "./pages/Home";
 import BlogPage from "./pages/BlogPage";
+import CommunityPage from "./pages/CommunityPage";
+import PostPage from "./pages/PostPage";
 
 const router = createBrowserRouter([
     {
@@ -79,6 +81,14 @@ const router = createBrowserRouter([
                         element: <MyCommunities/>,
                     },
                 ],
+            },
+            {
+                path: "/community/communityPage",
+                element: <CommunityPage />,
+            },
+            {
+                path: "/post/postPage",
+                element: <PostPage />,
             },
             {
                 path: "/settings",
