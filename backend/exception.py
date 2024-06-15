@@ -19,3 +19,6 @@ class BE_Exception:
         status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     UserNotInCommunity = HTTPException(
         status_code=status.HTTP_404_NOT_FOUND, detail="User not in community")
+    AlreadyFollowing = HTTPException(status_code=400, detail="Already following")
+    TikzError = HTTPException(status_code=500, detail="Error occurred during TikZ compilation or image conversion")
+    ImageError = HTTPException(status_code=404, detail="Image not found")

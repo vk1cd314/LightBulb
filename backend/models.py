@@ -96,3 +96,10 @@ class BlogDetailsResponse(BaseModel):
     class Config:
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str, datetime: str}
+        
+class TikzModel(BaseModel):
+    tikz_code: str
+
+class ImageModel(BaseModel):
+    id: str
+    base64_image: str

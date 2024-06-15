@@ -1,12 +1,16 @@
 from fastapi import APIRouter, Depends
-from models import Blog, Like, Comment, BlogDetailsResponse
+from models import Blog, Like, Comment, BlogDetailsResponse, ImageModel, TikzModel
 from database import get_collection
 from exception import BE_Exception as exception
+from tikzrenderer.tikzrender import *
 
 router = APIRouter(prefix="/blogs", tags=["blogs"])
 
 def get_blog_collection():
     return get_collection('blogs')
+
+def get_image_collection():
+    return get_collection('images')
 
 @router.post("/",response_model=Blog)
 async def create_blog(blog: Blog, collection=Depends(get_blog_collection)):
@@ -21,7 +25,6 @@ async def create_blog(blog: Blog, collection=Depends(get_blog_collection)):
     if user is None:
         raise exception.UserNotFound
     
-    # check if the user belngs to the given community id
     if blog_dict["commid"] is not None:
         community = await get_collection("communities").find_one({"_id": blog_dict["commid"]})
         if community is None:
@@ -246,3 +249,26 @@ async def get_blog_details(blog_id: str, blog_collection=Depends(get_blog_collec
     
     response = BlogDetailsResponse(blog=blog, user=user, comments=comments)
     return response
+
+@router.post("/generate", response_model=ImageModel)
+async def generate_image(tikz: TikzModel):
+    output_file = "output.jpg"  
+    
+    success = compile_tikz_to_jpg(tikz.tikz_code, output_file)
+    if not success:
+        raise exception.TikzError
+    
+    base64_string = encode_image_to_base64(output_file)
+    
+    image_data = {"base64_image": base64_string}
+    result = get_image_collection().insert_one(image_data)
+    
+    return {"id": str(result.inserted_id), "base64_image": base64_string}
+
+@router.get("/image/{image_id}", response_model=ImageModel)
+async def get_image(image_id: str):
+    image_data = get_image_collection*().find_one({"_id": image_id})
+    if image_data is None:
+        raise exception.ImageError
+    
+    return {"id": str(image_data["_id"]), "base64_image": image_data["base64_image"]}

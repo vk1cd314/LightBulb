@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Path, Query
 from typing import List
 from bson import ObjectId
-from models import User
+from models import User, Following
 from database import get_collection
 from pymongo.collection import Collection
 import logging
@@ -11,6 +11,9 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 def get_users_collection() -> Collection:
     return get_collection('users')
+
+def get_following_collection() -> Collection:
+    return get_collection('following')
 
 @router.post("/", response_model=User)
 async def create_user(user: User, collection=Depends(get_users_collection)):
@@ -82,3 +85,32 @@ async def search_users(query: str = Query(..., title="Search Query"), collection
     except Exception as e:
         logging.error(f"Error occurred: {e}")
         raise exception.ServerException
+
+@router.get("/following/{uid}", response_model=List[User])
+async def get_following(uid: str):
+    followings = get_following_collection().find({"uid1": uid})
+    following_uids = [following["uid2"] for following in await followings.to_list(length=None)]
+    
+    users = await get_users_collection().find({"_id": {"$in": following_uids}}).to_list(length=None)
+    return users
+
+@router.get("/followers/{uid}", response_model=List[User])
+async def get_followers(uid: str):
+    followers = get_following_collection().find({"uid2": uid})
+    follower_uids = [follower["uid1"] for follower in await followers.to_list(length=None)]
+    
+    users = await get_users_collection().find({"_id": {"$in": follower_uids}}).to_list(length=None)
+    return users
+
+
+@router.post("/follow", response_model=Following)
+async def follow(following: Following):
+    if not await get_users_collection().find_one({"_id": following.uid1}):
+        raise exception.UserNotFound
+    if not await get_users_collection().find_one({"_id": following.uid2}):
+        raise exception.UserNotFound
+    if await get_following_collection().find_one({"uid1": following.uid1, "uid2": following.uid2}):
+        raise exception.AlreadyFollowing
+
+    result = await get_following_collection().insert_one(following.dict())
+    return following
