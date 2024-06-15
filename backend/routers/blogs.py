@@ -1,14 +1,12 @@
 from fastapi import APIRouter, Depends
-from models import Blog, Like, Comment
+from models import Blog, Like, Comment, BlogDetailsResponse
 from database import get_collection
 from exception import BE_Exception as exception
 
 router = APIRouter(prefix="/blogs", tags=["blogs"])
 
-
 def get_blog_collection():
     return get_collection('blogs')
-
 
 @router.post("/",response_model=Blog)
 async def create_blog(blog: Blog, collection=Depends(get_blog_collection)):
@@ -86,9 +84,6 @@ async def get_blogs(collection=Depends(get_blog_collection)):
     return blogs
 
 
-# In given api document, api endpoint is :"users/{user_id}/blogs"
-# But in this method , the api endpoint is: "blogs/{user_id}/users"
-# In user, use this method accordingly
 @router.get("/{user_id}/users",response_model=list[Blog])
 async def get_user_blogs(user_id: str, collection=Depends(get_blog_collection)):
     blogs = []
@@ -96,9 +91,6 @@ async def get_user_blogs(user_id: str, collection=Depends(get_blog_collection)):
         blogs.append(blog)
     return blogs
 
-# In given api document, api endpoint is :"communities/{community_id}/blogs"
-# But in this method , the api endpoint is: "blogs/{community_id}/communities"
-# In community, use this method accordingly
 @router.get("/{community_id}/communities",response_model=list[Blog])
 async def get_community_blogs(community_id: str, collection=Depends(get_blog_collection)):
     blogs = []
@@ -225,6 +217,32 @@ async def get_likes(like_id:str):
 @router.get("/search/{search_query}",response_model=list[Blog])
 async def search_blogs(search_query: str, collection=Depends(get_blog_collection)):
     blogs = []
-    async for blog in collection.find({"content": {"$regex": search_query}}):
+    async for blog in collection.find({"title": {"$regex": search_query}}):
         blogs.append(blog)
     return blogs
+
+
+def get_user_collection():
+    return get_collection('users')
+
+def get_comment_collection():
+    return get_collection('comments')
+
+@router.get("/{blog_id}/details", response_model=BlogDetailsResponse)
+async def get_blog_details(blog_id: str, blog_collection=Depends(get_blog_collection),
+                           user_collection=Depends(get_user_collection),
+                           comment_collection=Depends(get_comment_collection)):
+    blog = await blog_collection.find_one({"_id": blog_id})
+    if blog is None:
+        raise exception.NotFound
+
+    user = await user_collection.find_one({"_id": blog["uid"]})
+    if user is None:
+        raise exception.UserNotFound
+
+    comments = []
+    async for comment in comment_collection.find({"blogid": blog_id}):
+        comments.append(comment)
+    
+    response = BlogDetailsResponse(blog=blog, user=user, comments=comments)
+    return response

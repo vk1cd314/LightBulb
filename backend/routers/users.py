@@ -1,10 +1,11 @@
-from fastapi import APIRouter, HTTPException, Depends, Path, Query
+from fastapi import APIRouter, Depends, Path, Query
 from typing import List
 from bson import ObjectId
 from models import User
 from database import get_collection
 from pymongo.collection import Collection
 import logging
+from exception import BE_Exception as exception
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -15,9 +16,9 @@ def get_users_collection() -> Collection:
 async def create_user(user: User, collection=Depends(get_users_collection)):
     existing_user = await collection.find_one({"email": user.email})
     if existing_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
+        raise exception.BadRequest
 
-    user_dict = user.dict(by_alias=True)
+    user_dict = user.model_dump(by_alias=True)
     result = await collection.insert_one(user_dict)
     created_user = await collection.find_one({"_id": result.inserted_id})
     return User(**created_user)
@@ -25,42 +26,42 @@ async def create_user(user: User, collection=Depends(get_users_collection)):
 @router.get("/{uid}", response_model=User)
 async def get_user_by_id(uid: str = Path(..., title="User ID"), collection=Depends(get_users_collection)):
     if not ObjectId.is_valid(uid):
-        raise HTTPException(status_code=400, detail="Invalid User ID")
+        raise exception.BadRequest
     
     user = await collection.find_one({"_id": uid})
     if user:
         return User(**user)
     else:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise exception.UserNotFound
 
 @router.put("/{uid}", response_model=User)
 async def update_user(uid: str, user_data: User, collection=Depends(get_users_collection)):
     if not ObjectId.is_valid(uid):
-        raise HTTPException(status_code=400, detail="Invalid User ID")
+        raise exception.BadRequest
 
     existing_user = await collection.find_one({"_id": uid})
     if existing_user:
-        await collection.update_one({"_id": uid}, {"$set": user_data.dict(by_alias=True)})
+        await collection.update_one({"_id": uid}, {"$set": user_data.model_dump(by_alias=True)})
         updated_user = await collection.find_one({"_id": uid})
         return User(**updated_user)
     else:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise exception.UserNotFound
 
 @router.delete("/{uid}", response_model=dict)
 async def delete_user(uid: str, collection=Depends(get_users_collection)):
     if not ObjectId.is_valid(uid):
-        raise HTTPException(status_code=400, detail="Invalid User ID")
+        raise exception.BadRequest
 
     delete_result = await collection.delete_one({"_id": uid})
     if delete_result.deleted_count == 1:
         return {"status": "success", "message": "User deleted successfully"}
     else:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise exception.UserNotFound
 
 @router.get("/", response_model=List[User])
 async def list_users(collection=Depends(get_users_collection)):
     cursor = collection.find({})
-    users = await cursor.to_list(length=1000)  
+    users = await cursor.to_list(length=1000)
     return [User(**user) for user in users]
 
 @router.get("/search", response_model=List[User])
@@ -80,4 +81,4 @@ async def search_users(query: str = Query(..., title="Search Query"), collection
         return [User(**user) for user in users]
     except Exception as e:
         logging.error(f"Error occurred: {e}")
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+        raise exception.ServerException

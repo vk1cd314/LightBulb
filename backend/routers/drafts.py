@@ -1,10 +1,11 @@
-from fastapi import APIRouter, HTTPException, Depends, Path, Query
+from fastapi import APIRouter, Depends
 from typing import List
 from bson import ObjectId
 from models import Draft
 from database import get_collection
 from pymongo.collection import Collection
 from datetime import datetime
+from exception import BE_Exception as exception
 
 router = APIRouter(prefix="/drafts", tags=["drafts"])
 
@@ -21,13 +22,13 @@ async def create_draft(draft: Draft, collection=Depends(get_drafts_collection)):
 @router.get("/{draftid}", response_model=Draft)
 async def get_draft(draftid: str, collection=Depends(get_drafts_collection)):
     if not ObjectId.is_valid(draftid):
-        raise HTTPException(status_code=400, detail="Invalid Draft ID")
+        raise exception.BadRequest
 
     draft = await collection.find_one({"_id": draftid})
     if draft:
         return Draft(**draft)
     else:
-        raise HTTPException(status_code=404, detail="Draft not found")
+        raise exception.NotFound
 
 @router.get("/{uid}", response_model=List[Draft])
 async def get_user_drafts(uid: str, collection=Depends(get_drafts_collection)):
@@ -38,7 +39,7 @@ async def get_user_drafts(uid: str, collection=Depends(get_drafts_collection)):
 @router.put("/{draftid}", response_model=Draft)
 async def update_draft(draftid: str, draft_data: Draft, collection=Depends(get_drafts_collection)):
     if not ObjectId.is_valid(draftid):
-        raise HTTPException(status_code=400, detail="Invalid Draft ID")
+        raise exception.BadRequest
 
     existing_draft = await collection.find_one({"_id": draftid})
     if existing_draft:
@@ -47,15 +48,15 @@ async def update_draft(draftid: str, draft_data: Draft, collection=Depends(get_d
         updated_draft = await collection.find_one({"_id": draftid})
         return Draft(**updated_draft)
     else:
-        raise HTTPException(status_code=404, detail="Draft not found")
+        raise exception.NotFound
 
 @router.delete("/{draftid}", response_model=dict)
 async def delete_draft(draftid: str, collection=Depends(get_drafts_collection)):
     if not ObjectId.is_valid(draftid):
-        raise HTTPException(status_code=400, detail="Invalid Draft ID")
+        raise exception.BadRequest
 
     delete_result = await collection.delete_one({"_id": draftid})
     if delete_result.deleted_count == 1:
         return {"status": "success", "message": "Draft deleted successfully"}
     else:
-        raise HTTPException(status_code=404, detail="Draft not found")
+        raise exception.NotFound

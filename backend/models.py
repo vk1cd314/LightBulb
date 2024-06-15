@@ -30,6 +30,7 @@ class Community(BaseModel):
 class Blog(BaseModel):
     blogid: Optional[str] = Field(default_factory=lambda: str(ObjectId()), alias="_id")
     uid: str
+    title: str
     commid: Optional[str] = None
     content: str
     comments: Optional[str] = None
@@ -45,6 +46,7 @@ class Blog(BaseModel):
 class Draft(BaseModel):
     draftid: Optional[str] = Field(default_factory=lambda: str(ObjectId()), alias="_id")
     uid: str
+    title: Optional[str] = None
     commid: Optional[str] = None
     content: str
     created_at: datetime = Field(default_factory=datetime.utcnow)
@@ -82,6 +84,15 @@ class Comment(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: Optional[datetime] = None
 
+    class Config:
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str, datetime: str}
+
+class BlogDetailsResponse(BaseModel):
+    blog: Blog
+    user: User
+    comments: List[Comment]
+    
     class Config:
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str, datetime: str}
