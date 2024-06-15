@@ -1,6 +1,8 @@
 import { useState } from "react";
 import Tiptap from "../TipTap/TipTap";
 import katex from "katex";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
+import axios from "axios";
 
 const CreateBlog = () => {
     const [content, setContent] = useState("");
@@ -41,14 +43,20 @@ const CreateBlog = () => {
     };
 
 
+    const axiosSecure = useAxiosSecure()
 
     const handlePreview = () => {
         setPreview(renderLatex(content));
         const tikzPictureRegex = /\\begin{tikzpicture}(.*?)\\end{tikzpicture}/gs; // Regular expression to match TikZ pictures
-
-
+        
+        
         const tikzPictures = content.match(tikzPictureRegex);
         setTikzPicture(tikzPictures);
+        console.log(tikzPictures[0].toString())
+        axiosSecure.post("/blogs/generate", {"tikz_code": tikzPictures[0].toString()})
+            .then((response) => {
+                console.log(response.data.base64_image);
+            })
         // setPreview(tikzPictures);
     };
 

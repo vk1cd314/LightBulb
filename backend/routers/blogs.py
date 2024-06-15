@@ -263,7 +263,7 @@ async def generate_image(tikz: TikzModel):
     image_data = {"base64_image": base64_string}
     result = get_image_collection().insert_one(image_data)
     
-    return {"id": str(result.inserted_id), "base64_image": base64_string}
+    return {"id": "1", "base64_image": base64_string}
 
 @router.get("/image/{image_id}", response_model=ImageModel)
 async def get_image(image_id: str):
