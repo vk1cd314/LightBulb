@@ -1,6 +1,6 @@
 import os
 import subprocess
-import re
+import base64
 
 def compile_tikz_to_jpg(tikz_code, output_file):
     latex_content = (
@@ -31,7 +31,7 @@ def compile_tikz_to_jpg(tikz_code, output_file):
         return
     
     pdf_file = "temp_tikz.pdf"
-    convert_command = ["magick", "-density", "1000", pdf_file, output_file]
+    convert_command = ["magick", "-density", "300", pdf_file, output_file]
     try:
         subprocess.check_call(convert_command)
     except subprocess.CalledProcessError as e:
@@ -62,9 +62,25 @@ def extract_tikz_from_tex(tex_file):
         return
     return tikz_code
 
+def encode_image_to_base64(image_path):
+    with open(image_path, "rb") as image_file:
+        encoded_string = base64.b64encode(image_file.read()).decode("utf-8")
+    return encoded_string
+
+def decode_base64_to_image(base64_string, output_file):
+    with open(output_file, "wb") as image_file:
+        image_file.write(base64.b64decode(base64_string))
+
 if __name__ == "__main__":
     tikz_code = extract_tikz_from_tex("example.tex")
     
     output_file = "output.jpg"  
     
     compile_tikz_to_jpg(tikz_code, output_file)
+    
+    base64_string = encode_image_to_base64(output_file)
+    print(base64_string)
+    
+    output_file = "decoded_output.jpg"
+    
+    decode_base64_to_image(base64_string, output_file)

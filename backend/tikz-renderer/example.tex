@@ -1,34 +1,30 @@
 \begin{tikzpicture}
     \begin{axis}[
-        xmin = -6, xmax = 6,
-        ymin = 0, ymax = 1,
-        width = \textwidth,
-        height = 0.5\textwidth,
-        xtick distance = 1,
-        ytick distance = 1,
+        width = 0.75\textwidth,
+        height = 0.75\textwidth,
         grid = both,
         minor tick num = 1,
         major grid style = {lightgray},
         minor grid style = {lightgray!25},
-        xlabel = {Input ($z$)},
-        ylabel = {Output ($g(z)$)},
+        xlabel = {$w$},
+        ylabel = {$b$},
+        zlabel = {$J(w,b)$},
         legend cell align = {left},
         legend pos = north west,
-        ytick={0,.5,1},
-        axis y line=middle
+        axis line style = {thick},
+        % colormap/viridis
     ]
-     
-    \addplot%
-    [
-        blue,%
-        mark=none,
-        samples=100,
-        domain=-10:10,
-    ]
-    (x,{1/(1+exp(-x))});      
+    
+    \addplot3 [
+        domain=-5:2,
+        domain y = -3:1,
+        samples = 20,
+        samples y = 30,
+        surf,
+        shader=faceted interp] {x^2 + y^2};
      
     % Add legend
-    \addlegendentry{Sigmoid Function $\frac{1}{1 + e^{-x}}$}
+    \addlegendentry{Cost Function $J(w, b)$}
      
     \end{axis}
     \end{tikzpicture}
