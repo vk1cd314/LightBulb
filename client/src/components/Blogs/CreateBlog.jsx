@@ -7,23 +7,17 @@ import axios from "axios";
 const CreateBlog = () => {
     const [content, setContent] = useState("");
     const [title, setTitle] = useState("");
-    const [preview, setPreview] = useState("");
-    const [tikzPicture, setTikzPicture] = useState("");
+    const [preview, setPreview] = useState(""); // State to hold rendered HTML preview
+    const [tikzPicture, setTikzPicture] = useState(""); // State to hold TikZ pictures
 
-    const handlePublish = () => {
-        // publish to db
-        console.log(content);
-    };
+    // Custom Axios instance for secure requests
+    const axiosSecure = useAxiosSecure();
 
-    // Convert LaTeX to HTML using katex
+    // Function to render LaTeX expressions to HTML using KaTeX
     const renderLatex = (latex) => {
-        // Regular expression to match inline LaTeX expressions
         const inlineLatexRegex = /\$(.*?)\$/g;
-
-        // Regular expression to match display mode LaTeX expressions
         const displayLatexRegex = /\$\$(.*?)\$\$/g;
 
-        // Replace inline LaTeX expressions with their HTML equivalents
         let html = latex.replace(inlineLatexRegex, (match, latexExpression) => {
             return katex.renderToString(latexExpression, {
                 throwOnError: false,
@@ -31,7 +25,6 @@ const CreateBlog = () => {
             });
         });
 
-        // Replace display mode LaTeX expressions with their HTML equivalents
         html = html.replace(displayLatexRegex, (match, latexExpression) => {
             return katex.renderToString(latexExpression, {
                 throwOnError: false,
@@ -42,29 +35,38 @@ const CreateBlog = () => {
         return html;
     };
 
-
-    const axiosSecure = useAxiosSecure()
-
+    // Function to handle preview button click
     const handlePreview = () => {
-        setPreview(renderLatex(content));
-        const tikzPictureRegex = /\\begin{tikzpicture}(.*?)\\end{tikzpicture}/gs; // Regular expression to match TikZ pictures
+        setPreview(renderLatex(content)); // Render LaTeX content to HTML and set to preview state
         
-        
+        const tikzPictureRegex = /\\begin{tikzpicture}(.*?)\\end{tikzpicture}/gs;
         const tikzPictures = content.match(tikzPictureRegex);
-        setTikzPicture(tikzPictures);
-        console.log(tikzPictures[0].toString())
-        axiosSecure.post("/blogs/generate", {"tikz_code": tikzPictures[0].toString()})
-            .then((response) => {
-                console.log(response.data.base64_image);
-            })
-        // setPreview(tikzPictures);
+
+        setTikzPicture(tikzPictures); // Set TikZ pictures state for reference
+
+        // Assuming there's at least one TikZ picture in the content
+        if (tikzPictures && tikzPictures.length > 0) {
+            axiosSecure.post("/blogs/generate", { "tikz_code": tikzPictures[0].toString() })
+                .then((response) => {
+                    const base64Image = response.data.base64_image;
+                    console.log(base64Image)
+
+                    // Set the preview state to display the image
+                    setPreview(`<img src="data:image/png;base64,${base64Image}" />`);
+                })
+                .catch((error) => {
+                    console.error('Error fetching image:', error);
+                });
+        }
     };
 
-
+    const handlePublish = () => {
+        // Publish logic here (not implemented in this example)
+        console.log(content);
+    };
 
     return (
         <div className="min-h-dvh mt-32 max-w-5xl mx-auto">
-            {/* blog title input */}
             <div className="flex gap-10 items-center">
                 <p className="text-2xl font-bold">Title:</p>
                 <input
@@ -92,14 +94,9 @@ const CreateBlog = () => {
             </div>
 
             <p className="font-bold text-xl mt-10">Raw:</p>
-            <p
-                className="max-w-5xl p-5 border-2 border-gray-200 w-full rounded-lg mt-5 mb-20"
-            >{content}</p>
+            <p className="max-w-5xl p-5 border-2 border-gray-200 w-full rounded-lg mt-5 mb-20">{content}</p>
             <p className="font-bold text-xl mt-10">Preview:</p>
-            <div
-                className="prose max-w-5xl p-5 border-2 border-gray-200 w-full rounded-lg mt-5 mb-20"
-                dangerouslySetInnerHTML={{ __html: preview }}
-            />
+            <div className="prose max-w-5xl p-5 border-2 border-gray-200 w-full rounded-lg mt-5 mb-20" dangerouslySetInnerHTML={{ __html: preview }} />
         </div>
     );
 };
