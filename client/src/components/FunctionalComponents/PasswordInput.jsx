@@ -35,9 +35,9 @@ const PasswordInput = ({ name, placeholder, onValueChange }) => {
                     }}
                 >
                     {showPassword ? (
-                        <TbEyeClosed className="text-black text-2xl hide" />
-                    ) : (
                         <TbEye className="text-black text-2xl show" />
+                    ) : (
+                        <TbEyeClosed className="text-black text-2xl hide" />
                     )}
                 </button>
             )}

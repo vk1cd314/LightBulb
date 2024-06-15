@@ -1,8 +1,8 @@
 import { Link, NavLink } from "react-router-dom";
 import { FaMagnifyingGlass, FaUserAstronaut } from "react-icons/fa6";
-import { AuthContext } from "../Auth/AuthProvider";
+import { AuthContext } from "../../Auth/AuthProvider";
 import { useContext, useEffect, useState } from "react";
-import { MessageContext } from "../pages/Root";
+import { MessageContext } from "../../pages/Root";
 import { IoMdLogOut } from "react-icons/io";
 import { TiThMenu } from "react-icons/ti";
 
@@ -26,7 +26,7 @@ const Navbar = () => {
             </li>
             <li>
                 <NavLink
-                    to="/blog"
+                    to="/blogs/explore"
                     className={({ isActive }) =>
                         isActive ? `${active}` : `${inactive}`
                     }
@@ -46,7 +46,7 @@ const Navbar = () => {
             </li>
             <li>
                 <NavLink
-                    to="/communities"
+                    to="/communities/explore"
                     className={({ isActive }) =>
                         isActive ? `${active}` : `${inactive}`
                     }
@@ -189,7 +189,7 @@ const Navbar = () => {
                         isActive ? `${active}` : `${inactive}`
                     }
                 >
-                    Explore
+                    Explore Communities
                 </NavLink>
             </li>
             <li>
@@ -200,6 +200,26 @@ const Navbar = () => {
                     }
                 >
                     My Communities
+                </NavLink>
+            </li>
+            <li>
+                <NavLink
+                    to="/blogs/explore"
+                    className={({ isActive }) =>
+                        isActive ? `${active}` : `${inactive}`
+                    }
+                >
+                    Explore Blogs
+                </NavLink>
+            </li>
+            <li>
+                <NavLink
+                    to="/blogs/my-blogs"
+                    className={({ isActive }) =>
+                        isActive ? `${active}` : `${inactive}`
+                    }
+                >
+                    My Blogs
                 </NavLink>
             </li>
         </>

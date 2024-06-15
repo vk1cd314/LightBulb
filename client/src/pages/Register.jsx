@@ -5,6 +5,7 @@ import { MessageContext } from "./Root";
 import PasswordInput from "../components/FunctionalComponents/PasswordInput";
 import Loader from "../components/FunctionalComponents/Loader";
 import { FcGoogle } from "react-icons/fc";
+import useAxiosSecure from "../hooks/useAxiosSecure";
 
 const Register = () => {
     const {
@@ -21,6 +22,8 @@ const Register = () => {
 
     const [password, setPassword] = useState("");
     const [confirmation, setConfirmation] = useState("");
+    
+    const axiosSecure = useAxiosSecure();
 
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -44,7 +47,7 @@ const Register = () => {
         const formData = new FormData(e.target);
         const name = formData.get("name");
         const email = formData.get("email");
-        let username = formData.get("username");
+        const username = formData.get("username");
         const passwordValue = password;
         const confirmationValue = confirmation;
 
@@ -62,8 +65,10 @@ const Register = () => {
             return;
         }
 
+
         try {
             await createUser(email, passwordValue);
+            // If createUser is successful, then post to the backend
         } catch (error) {
             if (error.code === "auth/email-already-in-use") {
                 notifyError("Email already in use");
@@ -73,6 +78,28 @@ const Register = () => {
                 return;
             }
         }
+        
+        // Post to the backend
+// @app.post("/users/", response_model=User)
+// async def create_user(user: User, collection=Depends(get_collection('users'))):
+// user_dict = user.dict(by_alias=True)
+// result = await collection.insert_one(user_dict)
+// user_dict["_id"] = result.inserted_id
+// return user_dict
+        const user = {
+            "name": name,
+            "email": email,
+            "username": username,
+            "profile_picture": "https://i.ibb.co/hYbbGyR/6596121-modified.png"
+        }
+
+        axiosSecure.post("/users/", user)
+            .then((response) => {
+                console.log(response);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
 
         await updateUserProfile(user, name, "https://i.ibb.co/hYbbGyR/6596121-modified.png")
             .then(() => {

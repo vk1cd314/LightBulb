@@ -13,6 +13,16 @@ import Settings from "./pages/Settings";
 import Profile from "./pages/Profile";
 import Communities from "./pages/Communities";
 import CreateCommunity from './components/Communities/CreateCommunity';
+import Blogs from "./pages/Blogs";
+import ExploreCommunities from "./components/Communities/ExploreCommunities";
+import MyCommunities from "./components/Communities/MyCommunities";
+import CreatePost from "./components/Blogs/CreateBlog";
+import CreateBlog from "./components/Blogs/CreateBlog";
+import AllBlogsCards from "./components/Blogs/AllBlogsCards";
+import Home from "./pages/Home";
+import BlogPage from "./pages/BlogPage";
+import CommunityPage from "./pages/CommunityPage";
+import PostPage from "./pages/PostPage";
 
 const router = createBrowserRouter([
     {
@@ -22,7 +32,7 @@ const router = createBrowserRouter([
         children: [
             {
                 path: "/",
-                element: <div className="mt-20">Landing page</div>,
+                element: <Home />,
             },
             {
                 path: "/login",
@@ -33,12 +43,30 @@ const router = createBrowserRouter([
                 element: <Register />,
             },
             {
-                path: "/blog",
-                element: <div className="mt-20">Blog</div>,
+                path: "/blogs",
+                element: <Blogs></Blogs>,
+                children: [
+                    {
+                        path: "/blogs/explore",
+                        element: <AllBlogsCards></AllBlogsCards>,
+                    },
+                    {
+                        path: "/blogs/my-blogs",
+                        element: <AllBlogsCards></AllBlogsCards>,
+                    }
+                ]
+            },
+            {
+                path: "/create-blog",
+                element: <CreateBlog></CreateBlog>,
             },
             {
                 path: "/notifications",
                 element: <div className="mt-20">Notifications</div>,
+            },
+            {
+                path: "/blog/blogpage",
+                element: <BlogPage></BlogPage>,
             },
             {
                 path: "/communities",
@@ -46,13 +74,21 @@ const router = createBrowserRouter([
                 children: [
                     {
                         path: "/communities/explore",
-                        element: <div>Communities</div>,
+                        element: <ExploreCommunities />,
                     },
                     {
                         path: "/communities/my-communities",
-                        element: <div>Community</div>,
+                        element: <MyCommunities/>,
                     },
                 ],
+            },
+            {
+                path: "/community/communityPage",
+                element: <CommunityPage />,
+            },
+            {
+                path: "/post/postPage",
+                element: <PostPage />,
             },
             {
                 path: "/settings",
@@ -64,12 +100,16 @@ const router = createBrowserRouter([
             },
             {
                 path: "/profile",
-                element: <Profile />,
+                element: <PrivateRoute><Profile /></PrivateRoute>,
             },
             {
                 path: "/create-community",
-                element: <CreateCommunity />,
+                element: <PrivateRoute><CreateCommunity /></PrivateRoute>,
             },
+            {
+                path: "/create-post",
+                element: <PrivateRoute><CreatePost/></PrivateRoute>,
+            }
         ],
     },
 ]);

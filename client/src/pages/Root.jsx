@@ -1,7 +1,7 @@
-import { Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import { createContext } from "react";
 import toast, { Toaster } from "react-hot-toast";
-import Navbar from "../components/Navbar";
+import Navbar from "../components/Shared/Navbar";
 
 const MessageContext = createContext();
 
@@ -48,6 +48,18 @@ const Root = () => {
                 </main>
             </MessageContext.Provider>
             {/* scroll up button */}
+            {/* simple footer */}
+            <div className="bg-primary text-white text-center py-10 mt-20">
+                <p>&copy; 2024 LightBulb Community Blog. All rights reserved.</p>
+                <div className="flex justify-center gap-5 mt-5">
+                    <Link to="/terms" className="hover:underline">
+                        Terms of Service
+                    </Link>
+                    <Link to="/privacy" className="hover:underline">
+                        Privacy Policy
+                    </Link>
+                </div>
+            </div>
 
             <Toaster position="top-right" reverseOrder={false} />
         </>

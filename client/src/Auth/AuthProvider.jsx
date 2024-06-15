@@ -9,7 +9,6 @@ import {
     updateProfile,
     GoogleAuthProvider,
     signInWithPopup,
-    GithubAuthProvider,
 } from "firebase/auth";
 
 const AuthContext = createContext();
@@ -18,6 +17,8 @@ const AuthProvider = ({ children }) => {
     // State to keep track of the current user
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+
+    const [userInfo, setUserInfo] = useState({});
 
     // Function to create a new user
     const createUser = (email, password) => {
@@ -57,17 +58,12 @@ const AuthProvider = ({ children }) => {
     }, []);
 
     const googleProvider = new GoogleAuthProvider();
-    const githubProvider = new GithubAuthProvider();
 
     const googleLogin = () => {
         setLoading(true);
         return signInWithPopup(auth, googleProvider);
     };
 
-    const githubLogin = () => {
-        setLoading(true);
-        return signInWithPopup(auth, githubProvider);
-    };
 
     // Object to be passed as value to the context
     const authInfo = {
@@ -78,8 +74,9 @@ const AuthProvider = ({ children }) => {
         login,
         updateUserProfile,
         googleLogin,
-        githubLogin,
         setLoading,
+        userInfo,
+        setUserInfo,
     };
 
     return (
