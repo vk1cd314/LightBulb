@@ -21,7 +21,7 @@ async def create_user(user: User, collection=Depends(get_users_collection)):
     if existing_user:
         raise exception.BadRequest
 
-    user_dict = user.model_dump(by_alias=True)
+    user_dict = user.dict(by_alias=True)
     result = await collection.insert_one(user_dict)
     created_user = await collection.find_one({"_id": result.inserted_id})
     return User(**created_user)

@@ -12,6 +12,7 @@ def get_blog_collection():
 def get_image_collection():
     return get_collection('images')
 
+
 @router.post("/",response_model=Blog)
 async def create_blog(blog: Blog, collection=Depends(get_blog_collection)):
     blog_dict = blog.dict(by_alias=True)
@@ -224,6 +225,13 @@ async def search_blogs(search_query: str, collection=Depends(get_blog_collection
         blogs.append(blog)
     return blogs
 
+@router.get("/trending",response_model=list[Blog])
+async def get_trending_blogs(collection=Depends(get_blog_collection)):
+    blogs = []
+    async for blog in collection.find().sort(lambda x:len(x["likes"])*3 + 2*len(x["comments"]), -1):
+        blogs.append(blog)
+    return blogs
+
 
 def get_user_collection():
     return get_collection('users')
@@ -233,8 +241,8 @@ def get_comment_collection():
 
 @router.get("/{blog_id}/details", response_model=BlogDetailsResponse)
 async def get_blog_details(blog_id: str, blog_collection=Depends(get_blog_collection),
-                           user_collection=Depends(get_user_collection),
-                           comment_collection=Depends(get_comment_collection)):
+                            user_collection=Depends(get_user_collection),
+                            comment_collection=Depends(get_comment_collection)):
     blog = await blog_collection.find_one({"_id": blog_id})
     if blog is None:
         raise exception.NotFound
