@@ -52,7 +52,10 @@ async def update_user(uid: str, user_data: User, collection=Depends(get_users_co
 
     existing_user = await collection.find_one({"_id": uid})
     if existing_user:
-        await collection.update_one({"_id": uid}, {"$set": user_data.dict(by_alias=True)})
+        update_data = user_data.model_dump(by_alias=True)
+        update_data.pop("_id", None) 
+
+        await collection.update_one({"_id": uid}, {"$set": update_data})
         updated_user = await collection.find_one({"_id": uid})
         return User(**updated_user)
     else:
