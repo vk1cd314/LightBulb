@@ -350,3 +350,21 @@ async def get_image(image_id: str):
         raise exception.ImageError
     
     return {"id": str(image_data["_id"]), "base64_image": image_data["base64_image"]}
+
+@router.get("/{comment_id}/commentuser")
+async def get_comment_with_user_info(comment_id: str,
+                                     comments_collection=Depends(get_comment_collection),
+                                     user_collection=Depends(get_user_collection)):
+    comment = await comments_collection.find_one({"_id": comment_id})
+    user_info = await user_collection.find_one({"_id": comment["uid"]})
+
+    return {"comment": comment, "user_info": user_info}
+
+@router.get("/{reply_id}/replyuser")
+async def get_reply_with_user_info(reply_id: str,
+                                   reply_collection=Depends(get_reply_collection),
+                                   user_collection=Depends(get_user_collection)):
+    reply = await reply_collection.find_one({"_id": reply_id})
+    user_info = await user_collection.find_one({"_id": reply["uid"]})
+
+    return {"reply": reply, "user_info": user_info}

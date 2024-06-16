@@ -9,6 +9,8 @@ router = APIRouter(prefix="/communities", tags=["communities"])
 def get_communities_collection():
     return get_collection('communities')
 
+def get_user_collection():
+    return get_collection('users')
 
 @router.post("/", response_model=Community)
 async def create_community(community: Community, collection=Depends(get_communities_collection)):
@@ -58,9 +60,10 @@ async def read_communities(collection=Depends(get_communities_collection)):
 
 
 @router.put("/{community_id}/join", response_model=Community)
-async def join_community(community_id: str, user_id: str, collection=Depends(get_communities_collection)):
+async def join_community(community_id: str, user_id: str, 
+                         collection=Depends(get_communities_collection), 
+                         user_collection=Depends(get_user_collection)):
     community = await collection.find_one({"_id": community_id})
-    user_collection = get_collection("users")
     user = await user_collection.find_one({"_id": user_id})
     
     if user is None:
@@ -72,14 +75,17 @@ async def join_community(community_id: str, user_id: str, collection=Depends(get
         community_dict = community.copy()
         community_dict.pop("_id", None)
         await collection.replace_one({"_id": community_id}, community_dict)
+    else:
+        raise exception.AlreadyInCommunity
     
     return Community(**community)
 
 
 @router.put("/{community_id}/leave", response_model=Community)
-async def leave_community(community_id: str, user_id: str, collection=Depends(get_communities_collection)):
+async def leave_community(community_id: str, user_id: str, 
+                          collection=Depends(get_communities_collection), 
+                          user_collection=Depends(get_user_collection)):
     community = await collection.find_one({"_id": community_id})
-    user_collection = get_collection("users")
     user = await user_collection.find_one({"_id": user_id})
 
     if user is None:
@@ -92,6 +98,8 @@ async def leave_community(community_id: str, user_id: str, collection=Depends(ge
         community_dict = community.copy()
         community_dict.pop("_id", None)
         await collection.replace_one({"_id": community_id}, community_dict)
+    else:
+        exception.UserNotInCommunity
 
     return Community(**community)
 

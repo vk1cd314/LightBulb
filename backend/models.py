@@ -71,8 +71,8 @@ class Blog(BaseModel):
     title: str
     commid: Optional[str] = None
     content: str
-    comments: list[Comment] = []
-    likes: list[Like] = []
+    comments: list[str] = []
+    likes: list[str] = []
     created_at: str = Field(default_factory=lambda: datetime.now().strftime("%m/%d/%Y, %H:%M:%S"))
     updated_at: Optional[str] = None
 
