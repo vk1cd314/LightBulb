@@ -5,12 +5,27 @@ import { useContext, useEffect, useState } from "react";
 import { MessageContext } from "../../pages/Root";
 import { IoMdLogOut } from "react-icons/io";
 import { TiThMenu } from "react-icons/ti";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const Navbar = () => {
     const active = "text-accent";
     const inactive = "hover:text-accent";
-    const { user, logout, loading } = useContext(AuthContext);
+    const { user, logout, loading, setUserInfo, userInfo } = useContext(AuthContext);
     const { notifySuccess, notifyError } = useContext(MessageContext);
+    const axiosSecure = useAxiosSecure();
+
+    useEffect(() => {
+        if (!loading) {
+            axiosSecure
+                .get("/users/email/?email=" + user?.email)
+                .then((response) => {
+                    setUserInfo(response.data);
+                })
+                .catch(() => {
+                    notifyError("An error occurred. Please try again later.");
+                });
+        }
+    }, [user]);
 
     const navItems = (
         <>
@@ -122,7 +137,7 @@ const Navbar = () => {
                 <Link className="profileImage" to="/profile">
                     <img
                         className="size-12 rounded-full"
-                        src={user?.photoURL}
+                        src={userInfo.profilepic || "https://i.ibb.co/hYbbGyR/6596121-modified.png"} 
                         alt=""
                         title="View Profile"
                     />
@@ -243,7 +258,9 @@ const Navbar = () => {
                         LightBulb
                     </Link>
                     {/* large screen nav items */}
-                    <ul className="hidden font-bold lg:flex gap-4">{navItems}</ul>{" "}
+                    <ul className="hidden font-bold lg:flex gap-4">
+                        {navItems}
+                    </ul>{" "}
                     {/* search bar */}
                     <div className="lg:flex items-center font-medium gap-3">
                         <input
@@ -252,8 +269,11 @@ const Navbar = () => {
                             onChange={(e) => setSearch(e.target.value)}
                             className="rounded-lg border border-primary bg-transparent px-3 py-2 text-sm"
                         />
-                        <button onClick={handleSearch} className="bg-primary text-white rounded-lg px-3 py-2">
-                        <FaMagnifyingGlass />
+                        <button
+                            onClick={handleSearch}
+                            className="bg-primary text-white rounded-lg px-3 py-2"
+                        >
+                            <FaMagnifyingGlass />
                         </button>
                     </div>
                     {/* small screen nav items */}

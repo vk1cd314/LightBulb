@@ -6,6 +6,7 @@ from database import get_collection
 from pymongo.collection import Collection
 import logging
 from exception import BE_Exception as exception
+from pydantic import EmailStr
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -26,6 +27,13 @@ async def create_user(user: User, collection=Depends(get_users_collection)):
     created_user = await collection.find_one({"_id": result.inserted_id})
     return User(**created_user)
 
+@router.get("/email/", response_model=User)
+async def get_user_by_email(email: EmailStr, collection=Depends(get_users_collection)):
+    user = await collection.find_one({"email": email})
+    if user is None:
+        raise exception.UserNotFound
+    return User(**user)
+
 @router.get("/{uid}", response_model=User)
 async def get_user_by_id(uid: str = Path(..., title="User ID"), collection=Depends(get_users_collection)):
     if not ObjectId.is_valid(uid):
@@ -44,7 +52,7 @@ async def update_user(uid: str, user_data: User, collection=Depends(get_users_co
 
     existing_user = await collection.find_one({"_id": uid})
     if existing_user:
-        await collection.update_one({"_id": uid}, {"$set": user_data.model_dump(by_alias=True)})
+        await collection.update_one({"_id": uid}, {"$set": user_data.dict(by_alias=True)})
         updated_user = await collection.find_one({"_id": uid})
         return User(**updated_user)
     else:

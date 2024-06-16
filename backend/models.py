@@ -9,7 +9,8 @@ class User(BaseModel):
     email: EmailStr
     gender: Optional[str] = None
     username: Optional[str] = None
-    profilepic: Optional[str] = None
+    profilepic: Optional[str] = "https://i.ibb.co/hYbbGyR/6596121-modified.png"
+    about: Optional[str] = None
 
     class Config:
         populate_by_name = True

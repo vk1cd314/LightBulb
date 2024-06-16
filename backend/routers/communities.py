@@ -83,7 +83,7 @@ async def leave_community(community_id: str, user_id: str, collection=Depends(ge
         await collection.replace_one({"_id": community_id}, community)
     return community
 
-@router("/recommended", response_model=list[Community])
+@router.put("/recommended", response_model=list[Community])
 async def get_recommended_communities(topic: str, collection=Depends(get_communities_collection)):
     communities = []
     async for community in collection.find({"topic": topic}).sort(lambda x: len(x["memberlist"]),-1):

@@ -16,6 +16,7 @@ const Register = () => {
         loading,
         googleLogin,
         setLoading,
+        setUserInfo,
     } = useContext(AuthContext);
     const { notifySuccess, notifyError } = useContext(MessageContext);
     const navigate = useNavigate();
@@ -121,6 +122,19 @@ const Register = () => {
         try {
             await googleLogin().then(() => {
                 if (!loading) {
+                    const googleUser= {
+                        "name": user.displayName,
+                        "email": user.email,
+                        "username": user.displayName,
+                        "profile_picture": user.photoURL
+                    }
+                    axiosSecure.post("/users/", googleUser)
+                        .then((response) => {
+                            console.log(response);
+                        })
+                        .catch((error) => {
+                            console.error(error);
+                        });
                     notifySuccess("Logged in successfully");
                     navigate(location?.state ? location.state : "/");
                 }
