@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from models import Blog, Like, Comment, BlogDetailsResponse, ImageModel, TikzModel
+from models import Blog, Like, Comment, ImageModel, TikzModel, Reply
 from database import get_collection
 from exception import BE_Exception as exception
 from tikzrenderer.tikzrender import *
@@ -249,6 +249,37 @@ async def get_comments(comment_id:str, collection=Depends(get_comment_collection
         raise exception.NotFound
     print(comment)    
     return comment
+
+@router.post("/{blog_id}/{comment_id}/reply", response_model=Reply)
+async def reply_comment(blog_id: str, comment_id: str, reply: Reply, 
+                  blog_collection=Depends(get_blog_collection), 
+                  reply_collection=Depends(get_reply_collection)):
+    if reply is None or blog_id != reply.blogid or comment_id != reply.cid:
+        raise exception.BadRequest
+    
+    result = await reply_collection.insert_one(reply.dict(by_alias=True))    
+    return reply.dict(by_alias=True)
+
+@router.get("/{blog_id}/{comment_id}/replies", response_model=list[Reply])
+async def get_replies(blog_id: str, comment_id: str, collection=Depends(get_reply_collection)):
+    replies = []
+    async for reply in collection.find({"blogid": blog_id, "cid": comment_id}):
+        replies.append(reply)
+    return replies
+
+@router.delete("/{blog_id}/{comment_id}/reply", response_model=Reply)
+async def delete_reply(blog_id: str, comment_id: str, reply: Reply,
+                        blog_collection=Depends(get_blog_collection),
+                        reply_collection=Depends(get_reply_collection)):
+    if reply is None or blog_id != reply.blogid or comment_id != reply.cid:
+        raise exception.BadRequest
+    
+    to_remove = await reply_collection.find_one({"_id": reply.rid, "uid": reply.uid})
+    if to_remove is None:
+        raise exception.NotFound
+    
+    await reply_collection.delete_one({"_id": reply.rid})
+    return reply.dict(by_alias=True)
 
 @router.get("/{blog_id}/likes",response_model=list[Like])
 async def get_blog_likes(blog_id: str, collection=Depends(get_like_collection)):
