@@ -3,6 +3,7 @@ from models import Blog, Like, Comment, BlogDetailsResponse, ImageModel, TikzMod
 from database import get_collection
 from exception import BE_Exception as exception
 from tikzrenderer.tikzrender import *
+from bson import ObjectId
 
 router = APIRouter(prefix="/blogs", tags=["blogs"])
 
@@ -45,24 +46,31 @@ async def get_blog(blog_id: str, collection=Depends(get_blog_collection)):
     return blog
 
 
-@router.put("/{blog_id}",response_model=Blog)
+@router.put("/{blog_id}", response_model=Blog)
 async def update_blog(blog_id: str, blog: Blog, collection=Depends(get_blog_collection)):
+    if not ObjectId.is_valid(blog_id):
+        raise exception.BadRequest
+
+    blog_id_obj = blog_id
+
+    existing_blog = await collection.find_one({"_id": blog_id_obj})
+    if not existing_blog:
+        raise exception.NotFound
+
+    if existing_blog["uid"] != blog.uid:
+        raise exception.BadRequest
+    if existing_blog["commid"] != blog.commid:
+        raise exception.BadRequest
+
     blog_dict = blog.dict(by_alias=True)
-    
-    if blog_dict is None or blog_dict["_id"] is None:
-        raise exception.BadRequest
-    
-    blog = await collection.find_one({"_id": blog_id})
-    if blog["uid"] != blog_dict["uid"]:
-        raise exception.BadRequest
-    
-    if blog["commid"] != blog_dict["commid"]:
-        raise exception.BadRequest
-    
-    result = await collection.replace_one({"_id": blog_id}, blog_dict)
+    blog_dict.pop("_id", None)
+
+    result = await collection.replace_one({"_id": blog_id_obj}, blog_dict)
     if result.modified_count == 0:
         raise exception.NotFound
-    return blog_dict
+
+    updated_blog = await collection.find_one({"_id": blog_id_obj})
+    return Blog(**updated_blog)
 
 @router.delete("/{blog_id}",response_model=Blog)
 async def delete_blog(blog_id: str, collection=Depends(get_blog_collection)):
