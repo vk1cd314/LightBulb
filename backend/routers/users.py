@@ -20,7 +20,7 @@ def get_following_collection() -> Collection:
 async def create_user(user: User, collection=Depends(get_users_collection)):
     existing_user = await collection.find_one({"email": user.email})
     if existing_user:
-        raise exception.BadRequest
+        return existing_user
 
     user_dict = user.dict(by_alias=True)
     result = await collection.insert_one(user_dict)

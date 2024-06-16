@@ -110,7 +110,7 @@ const Settings = () => {
                         {/* set profile picture */}
                         <div className="flex flex-col items-center justify-center">
                             <img
-                                src={user?.photoURL}
+                                src={userInfo?.profilepic}
                                 alt="profile"
                                 className="rounded-full w-32 h-32"
                             />

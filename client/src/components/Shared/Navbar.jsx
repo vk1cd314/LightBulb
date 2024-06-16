@@ -21,9 +21,6 @@ const Navbar = () => {
                 .then((response) => {
                     setUserInfo(response.data);
                 })
-                .catch(() => {
-                    notifyError("An error occurred. Please try again later.");
-                });
         }
     }, [user]);
 

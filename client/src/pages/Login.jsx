@@ -68,13 +68,33 @@ const Login = () => {
     };
 
     const handleGoogleLogin = async () => {
+        console.log("in google login");
         try {
-            await googleLogin().then(() => {
-                if (!loading) {
-                    notifySuccess("Logged in successfully");
-                    navigate(location?.state ? location.state : "/");
-                }
-            });
+            const result = await googleLogin();
+            const user = result.user; // get the user info from the result
+    
+            // Create a user object
+            const newUser = {
+                name: user.displayName,
+                email: user.email,
+                username: user.email.split('@')[0], 
+                profilepic: user.photoURL || "https://i.ibb.co/hYbbGyR/6596121-modified.png",
+            };
+    
+            // Post the user to the backend
+            axiosSecure
+                .post("/users/", newUser)
+                .then((response) => {
+                    setUserInfo(response.data);
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+    
+            if (!loading) {
+                notifySuccess("Logged in successfully");
+                navigate(location?.state ? location.state : "/");
+            }
         } catch (error) {
             notifyError("An error occurred. Please try again later.");
         }
