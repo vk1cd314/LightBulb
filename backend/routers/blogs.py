@@ -107,13 +107,38 @@ async def get_blogs(collection=Depends(get_blog_collection)):
         blogs.append(blog)
     return blogs
 
+@router.get("/allblogs")
+async def get_all_blogs(user_collection=Depends(get_user_collection)):
+    blogs = get_blogs()
+    res = []
+    for blog in blogs:
+        user = await user_collection.find_one({"_id": blog["uid"]})
+        minires = {
+            "blog": blog,
+            "user": user
+        }
+        res.append(minires)
+    result = {
+        "blogs" : res
+    }
+    return result
 
-@router.get("/{user_id}/users",response_model=list[Blog])
-async def get_user_blogs(user_id: str, collection=Depends(get_blog_collection)):
+@router.get("/{user_id}/users")
+async def get_user_blogs(user_id: str, 
+                        collection=Depends(get_blog_collection), 
+                        user_collection=Depends(get_user_collection)):
+    user = await user_collection.find_one({"_id": user_id})
     blogs = []
     async for blog in collection.find({"uid": user_id}):
-        blogs.append(blog)
-    return blogs
+        minires = {
+            "blog": blog,
+            "user": user
+        }
+        blogs.append(minires)
+    res = {
+        "blogs": blogs
+    }
+    return res
 
 @router.get("/{community_id}/communities",response_model=list[Blog])
 async def get_community_blogs(community_id: str, collection=Depends(get_blog_collection)):
