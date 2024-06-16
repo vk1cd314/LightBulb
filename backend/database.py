@@ -5,7 +5,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 uri = os.getenv("MONGODB_URI")
-print(uri)
 client = AsyncIOMotorClient(uri)
 db = client["LightBulb"]
 

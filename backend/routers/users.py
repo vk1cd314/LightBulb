@@ -78,10 +78,8 @@ async def list_users(collection=Depends(get_users_collection)):
     users = await cursor.to_list(length=1000)
     return [User(**user) for user in users]
 
-@router.get("/search", response_model=List[User])
-async def search_users(query: str = Query(..., title="Search Query"), collection: Collection = Depends(get_users_collection)):
-    logging.info(f"Received search query: {query}")
-    
+@router.get("/search/{query}", response_model=List[User])
+async def search_users(query: str, collection: Collection = Depends(get_users_collection)):
     try:
         cursor = collection.find({
             "$or": [
@@ -90,11 +88,9 @@ async def search_users(query: str = Query(..., title="Search Query"), collection
             ]
         })
         users = await cursor.to_list(length=1000)
-        logging.info(f"Found users: {users}")
         
         return [User(**user) for user in users]
     except Exception as e:
-        logging.error(f"Error occurred: {e}")
         raise exception.ServerException
 
 @router.get("/following/{uid}", response_model=List[User])

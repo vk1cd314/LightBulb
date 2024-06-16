@@ -28,7 +28,7 @@ def compile_tikz_to_jpg(tikz_code, output_file):
         subprocess.check_call(pdflatex_command)
     except subprocess.CalledProcessError as e:
         print(f"Error occurred during pdflatex compilation: {e}")
-        return False
+        # return False
     
     pdf_file = "temp_tikz.pdf"
     convert_command = ["magick", "-density", "300", pdf_file, output_file]
@@ -36,7 +36,7 @@ def compile_tikz_to_jpg(tikz_code, output_file):
         subprocess.check_call(convert_command)
     except subprocess.CalledProcessError as e:
         print(f"Error occurred during conversion to JPG: {e}")
-        return False
+        # return False
     
     cleanup_files = [pdf_file, temp_tex_file, "temp_tikz.aux", "temp_tikz.log"]
     for file in cleanup_files:

@@ -28,16 +28,53 @@ class Community(BaseModel):
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
 
+class Like(BaseModel):
+    lid: Optional[str] = Field(default_factory=lambda: str(ObjectId()), alias="_id")
+    uid: str
+    blogid: str
+    created_at: str = Field(default_factory=lambda: datetime.now().strftime("%m/%d/%Y, %H:%M:%S"))
+
+    class Config:
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str, datetime: str}
+
+class Comment(BaseModel):
+    cid: Optional[str] = Field(default_factory=lambda: str(ObjectId()), alias="_id")
+    uid: str
+    blogid: str
+    commid: Optional[str] = None
+    commentcontent: str
+    created_at: str = Field(default_factory=lambda: datetime.now().strftime("%m/%d/%Y, %H:%M:%S"))
+    updated_at: Optional[str] = None
+
+    class Config:
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str, datetime: str}
+
+class Reply(BaseModel):
+    rid: Optional[str] = Field(default_factory=lambda: str(ObjectId()), alias="_id")
+    cid: str
+    uid: str
+    blogid: str
+    commid: Optional[str] = None
+    replycontent: str
+    created_at: str = Field(default_factory=lambda: datetime.now().strftime("%m/%d/%Y, %H:%M:%S"))
+    updated_at: Optional[str] = None
+
+    class Config:
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str, datetime: str}
+
 class Blog(BaseModel):
     blogid: Optional[str] = Field(default_factory=lambda: str(ObjectId()), alias="_id")
     uid: str
     title: str
     commid: Optional[str] = None
     content: str
-    comments: Optional[str] = None
-    likes: Optional[str] = None
+    comments: list[Comment] = []
+    likes: list[Like] = []
     created_at: str = Field(default_factory=lambda: datetime.now().strftime("%m/%d/%Y, %H:%M:%S"))
-    updated_at: Optional[datetime] = None
+    updated_at: Optional[str] = None
 
     class Config:
         populate_by_name = True
@@ -66,33 +103,10 @@ class Following(BaseModel):
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
 
-class Like(BaseModel):
-    lid: Optional[str] = Field(default_factory=lambda: str(ObjectId()), alias="_id")
-    uid: str
-    blogid: str
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-
-    class Config:
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str, datetime: str}
-
-class Comment(BaseModel):
-    cid: Optional[str] = Field(default_factory=lambda: str(ObjectId()), alias="_id")
-    uid: str
-    blogid: str
-    commid: Optional[str] = None
-    commentcontent: str
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: Optional[datetime] = None
-
-    class Config:
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str, datetime: str}
 
 class BlogDetailsResponse(BaseModel):
     blog: Blog
     user: User
-    comments: List[Comment]
     
     class Config:
         arbitrary_types_allowed = True

@@ -25,3 +25,5 @@ class BE_Exception:
                             detail="Error occurred during TikZ compilation or image conversion")
     ImageError = HTTPException(
         status_code=status.HTTP_404_NOT_FOUND, detail="Image not found")
+    AlreadyLiked = HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND, detail="Already Liked")
