@@ -36,7 +36,7 @@ class Blog(BaseModel):
     content: str
     comments: Optional[str] = None
     likes: Optional[str] = None
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: str = Field(default_factory=lambda: datetime.now().strftime("%m/%d/%Y, %H:%M:%S"))
     updated_at: Optional[datetime] = None
 
     class Config:
@@ -50,7 +50,7 @@ class Draft(BaseModel):
     title: Optional[str] = None
     commid: Optional[str] = None
     content: str
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=datetime.now)
     updated_at: Optional[datetime] = None
 
     class Config:

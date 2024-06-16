@@ -1,12 +1,16 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import Tiptap from "../TipTap/TipTap";
 import katex from "katex";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
+import { useLocation } from "react-router-dom";
+import { AuthContext } from "../../Auth/AuthProvider";
+import { useNavigate } from "react-router-dom/dist";
 
 const CreateBlog = () => {
     const [content, setContent] = useState("");
     const [title, setTitle] = useState("");
     const [preview, setPreview] = useState(""); // State to hold rendered HTML preview
+    const { userInfo } = useContext(AuthContext);
 
     // Custom Axios instance for secure requests
     const axiosSecure = useAxiosSecure();
@@ -34,7 +38,7 @@ const CreateBlog = () => {
     };
 
     // Function to handle preview button click
-    const handlePreview = () => {
+    const handlePreview = (callback) => {
         const tikzPictureRegex =
             /\\begin{tikzpicture}[\s\S]*?\\end{tikzpicture}/g;
         const tikzPictures = content.match(tikzPictureRegex);
@@ -55,15 +59,38 @@ const CreateBlog = () => {
 
                     // Set the preview state to display the updated content
                     setPreview(renderLatex(updatedContent));
-                })
-                .catch((error) => {
-                    console.error("Error fetching image:", error);
-                });
-        }
+                callback();
+            })
+            .catch((error) => {
+                console.error("Error fetching image:", error);
+            });
+    } else {
+        setPreview(renderLatex(content));
+        callback();
+    }
     };
 
+    const location = useLocation();
+    const navigate = useNavigate();
+
     const handlePublish = () => {
-        console.log(content);
+        handlePreview(() => {
+            if (location.pathname === "/blog/create"){
+                const newBlog = {
+                    title: title,
+                    content: preview,
+                    uid: userInfo._id,
+                    created_at: new Date().toLocaleString(),
+                };
+    
+                axiosSecure.post("/blogs", newBlog).then((response) => {
+                    console.log(response.data);
+                    navigate(`/b/${response.data._id}`);
+                }).catch((error) => {
+                    console.error(error);
+                });
+            }
+        });
     };
 
     return (

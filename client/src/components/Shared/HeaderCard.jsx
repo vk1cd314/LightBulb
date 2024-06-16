@@ -1,9 +1,11 @@
 import { BiComment } from "react-icons/bi";
 import { FaThumbsUp } from "react-icons/fa6";
+import PropTypes from "prop-types";
+import { Link } from "react-router-dom";
 
-const HeaderCard = () => {
+const HeaderCard = ({author, title, date, id}) => {
     return (
-        <div className="flex flex-col max-w-4xl p-5 border-2 border-gray-200 w-full space-y-4 rounded-lg">
+        <Link to={`/b/${id}`} className="flex flex-col max-w-4xl p-5 border-2 border-gray-200 w-full space-y-4 rounded-lg">
             <div className="flex items-center justify-between">
                 <div className="flex items-center">
                     <img
@@ -11,12 +13,12 @@ const HeaderCard = () => {
                         src="https://randomuser.me/api/portraits"
                     />
                     <div className="ml-3">
-                        <h1 className="font-bold">John Doe</h1>
-                        <p className="text-gray-500">2 hours ago</p>
+                        <h1 className="font-bold">{author}</h1>
+                        <p className="text-gray-500">{date}</p>
                     </div>
                 </div>
                 <h1 className="font-bold text-xl">
-                    {"Blog title".substring(0, 80)}
+                    {`${title}`.substring(0, 80)}
                 </h1>
             </div>
             {/* blog title */}
@@ -31,8 +33,15 @@ const HeaderCard = () => {
                     <p>3</p>
                 </div>
             </div>
-        </div>
+        </Link>
     );
+};
+
+HeaderCard.propTypes = {
+    author: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    date: PropTypes.string.isRequired,
+    id: PropTypes.string.isRequired,
 };
 
 export default HeaderCard;
