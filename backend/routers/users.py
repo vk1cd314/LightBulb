@@ -167,3 +167,14 @@ async def get_user_data(uid: str, user_collection=Depends(get_users_collection),
         "following": [following["uid2"] for following in following],
         "followers": [follower["uid1"] for follower in followers]
     }
+
+@router.post("/followingtype")
+async def get_following_type(following: Following, following_collection=Depends(get_following_collection)):
+    existing_following = await following_collection.find_one({
+        "uid1": following.uid1,
+        "uid2": following.uid2
+    })
+    if existing_following is None:
+        return {"details": "false"}
+    else:
+        return {"details": "true"}
