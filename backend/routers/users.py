@@ -116,17 +116,20 @@ async def get_followers(uid: str, collection=Depends(get_following_collection), 
     return users
 
 
-@router.post("/follow", response_model=Following)
+@router.post("/follow")
 async def follow(following: Following, user_collection=Depends(get_users_collection), following_collection=Depends(get_following_collection)):
     if not await user_collection.find_one({"_id": following.uid1}):
         raise exception.UserNotFound
     if not await user_collection.find_one({"_id": following.uid2}):
         raise exception.UserNotFound
-    if await following_collection.find_one({"uid1": following.uid1, "uid2": following.uid2}):
-        raise exception.AlreadyFollowing
-
-    result = await following_collection.insert_one(following.dict())
-    return following
+    existing_following = await following_collection.find_one({"uid1": following.uid1, "uid2": following.uid2})
+    
+    if existing_following:
+        await following_collection.delete_one({"_id": existing_following["_id"]})
+        return {"detail": "Successfully unfollowed"}
+    else:
+        result = await following_collection.insert_one(following.dict())
+        return following
 
 @router.get("/{uid}/userdata")
 async def get_user_data(uid: str, user_collection=Depends(get_users_collection), following_collection=Depends(get_following_collection)):

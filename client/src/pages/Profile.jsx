@@ -3,20 +3,27 @@ import { AuthContext } from "../Auth/AuthProvider";
 import ProfileStats from "../components/ProfileStats";
 import { Link } from "react-router-dom";
 import useAxiosSecure from "../hooks/useAxiosSecure";
-import Communities from './Communities';
+import Communities from "./Communities";
+import Loader from "../components/FunctionalComponents/Loader";
 
 const Profile = () => {
     const { userInfo } = useContext(AuthContext);
-    console.log(userInfo);
     const axiosSecure = useAxiosSecure();
     const [profileData, setProfileData] = useState({});
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
+        setLoading(true);
         axiosSecure.get(`/users/${userInfo._id}/userdata`).then((response) => {
-            console.log(response.data);
             setProfileData(response.data);
+        }).finally(() => {
+            setLoading(false);
         });
     }, []);
+
+    if (loading) {
+        return <Loader/>;
+    }
 
     return (
         <div className=" max-w-5xl mx-auto mt-10">
@@ -60,7 +67,7 @@ const Profile = () => {
                                 stat={profileData?.blogs?.length}
                             ></ProfileStats>
                         </div>
-                         {/* buttons for drafts and my communities */}
+                        {/* buttons for drafts and my communities */}
                         <div className="my-5">
                             <button className="bg-primary text-white px-5 py-2 rounded-lg hover:bg-accent">
                                 My Drafts
@@ -80,7 +87,6 @@ const Profile = () => {
                         </div>
                     </div>
                 </div>
-               
             </div>
         </div>
     );

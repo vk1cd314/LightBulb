@@ -36,7 +36,7 @@ const UserProfiles = () => {
     const handleFollow = () => {
         setLoading(true);
         axiosSecure
-            .post(`/users/follow`, { uid1: currentUser._id, uid2: userId})
+            .post(`/users/follow`, { uid1: currentUser._id, uid2: userId })
             .then((response) => {
                 console.log(response.data);
                 notifySuccess("User Followed");

@@ -68,24 +68,34 @@ const AllBlogsCards = () => {
             });
     };
 
+    if (blogs.length === 0) {
+        return (
+            <div className="flex flex-col justify-center items-center mt-10">
+                <p className="text-2xl font-bold">No blogs to show</p>
+            </div>
+        );
+    }
+
     return (
-        <div className="flex flex-col items-center mt-10 space-y-3">
-            {blogs.map((blog) => {
-                return (
-                    <HeaderCard
-                        key={blog.blog._id}
-                        title={blog.blog.title}
-                        author={blog.user.name}
-                        authorid={blog.user._id}
-                        date={blog.blog.updated_at || blog.blog.created_at}
-                        blogid={blog.blog._id}
-                        likes={blog.blog.likes}
-                        comments={blog.blog.comments}
-                        authorProfilePic={blog.user.profilepic}
-                        handleDelete={handleDelete}
-                    />
-                );
-            })}
+        <div className="min-h-dvh">
+            <div className="grid grid-cols-2 gap-5 mt-10">
+                {blogs.map((blog) => {
+                    return (
+                        <HeaderCard
+                            key={blog.blog._id}
+                            title={blog.blog.title}
+                            author={blog.user.name}
+                            authorid={blog.user._id}
+                            date={blog.blog.updated_at || blog.blog.created_at}
+                            blogid={blog.blog._id}
+                            likes={blog.blog.likes}
+                            comments={blog.blog.comments}
+                            authorProfilePic={blog.user.profilepic}
+                            handleDelete={handleDelete}
+                        />
+                    );
+                })}
+            </div>
         </div>
     );
 };
