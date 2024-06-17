@@ -353,10 +353,11 @@ async def get_likes(like_id:str, collection=Depends(get_like_collection)):
     
     return like
 
-@router.get("/search/{search_query}",response_model=list[Blog])
+@router.get("/search/{search_query}", response_model=list[Blog])
 async def search_blogs(search_query: str, collection=Depends(get_blog_collection)):
     blogs = []
-    async for blog in collection.find({"title": {"$regex": search_query}}):
+    regex = {"$regex": search_query, "$options": "i"}  
+    async for blog in collection.find({"title": regex}):
         blogs.append(blog)
     return blogs
 

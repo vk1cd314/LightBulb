@@ -1,17 +1,14 @@
 import { BiComment } from "react-icons/bi";
 import { FaThumbsUp } from "react-icons/fa6";
 import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../../Auth/AuthProvider";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const HeaderCard = ({author, title, date, blogid, likes, comments, authorProfilePic, authorid, handleDelete}) => {
-    console.log(author, title, date, blogid, likes, comments, authorProfilePic, authorid);
     const axiosSecure = useAxiosSecure();
-
-    
-
+    const location = useLocation();
 
     const { userInfo } = useContext(AuthContext);
     return (
@@ -45,7 +42,7 @@ const HeaderCard = ({author, title, date, blogid, likes, comments, authorProfile
                 </div>
                 {/* delete button */}
                 {
-                    userInfo._id === authorid && (
+                    userInfo._id === authorid && location.pathname === "/blogs/my-blogs" && (
                         <button className="text-white text-sm hover:cursor-pointer font-bold bg-red-500 px-2 py-1 rounded-2xl" onClick={() => handleDelete(blogid)}>Delete</button>
                     )
                 }

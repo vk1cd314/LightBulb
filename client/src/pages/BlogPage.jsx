@@ -5,8 +5,9 @@ import { useParams } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import useAxiosSecure from "../hooks/useAxiosSecure";
 import { AuthContext } from "../Auth/AuthProvider";
-import { MessageContext } from "../pages/Root";
+
 import Loader from './../components/FunctionalComponents/Loader';
+import { MessageContext } from "./Root";
 
 const BlogPage = () => {
     const id = useParams().id;
