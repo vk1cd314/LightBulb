@@ -5,6 +5,8 @@ import { useParams } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import useAxiosSecure from "../hooks/useAxiosSecure";
 import { AuthContext } from "../Auth/AuthProvider";
+import { MessageContext } from "../pages/Root";
+import Loader from './../components/FunctionalComponents/Loader';
 
 const BlogPage = () => {
     const id = useParams().id;
@@ -12,34 +14,138 @@ const BlogPage = () => {
     const axiosSecure = useAxiosSecure();
 
     const [blogDetails, setBlogDetails] = useState({});
+    const [blogComments, setBlogComments] = useState([]);
     const { userInfo } = useContext(AuthContext);
+    const [likes, setLikes] = useState(0);
+    const { notifySuccess, notifyError } = useContext(MessageContext);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         // fetch blog
-        axiosSecure.get(`/blogs/${id}/details`).then((response) => {
-            console.log(response.data);
-            setBlogDetails(response.data);
-        });
+        setLoading(true);
+        Promise.all([
+            axiosSecure.get(`/blogs/${id}/details`),
+            axiosSecure.get(`/blogs/${id}/commentlist`),
+        ])
+            .then(([detailsResponse, commentsResponse]) => {
+                console.log(detailsResponse.data);
+                setBlogDetails(detailsResponse.data);
+                setLikes(detailsResponse.data.blog.likes.length);
+
+                console.log(commentsResponse.data);
+                setBlogComments(commentsResponse.data);
+            })
+            .catch((error) => {
+                console.error(error);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
     }, [id]);
 
     const handleLike = () => {
         const blogLike = {
             uid: userInfo._id,
             blogid: id,
-        }
-        axiosSecure.post(`/blogs/${id}/like`, blogLike).then((response) => {
-            console.log(response.data);
-            setBlogDetails((prev) => {
-                return {
-                    ...prev,
-                    blog: {
-                        ...prev.blog,
-                        likes: response.data.likes,
-                    },
-                };
+        };
+        axiosSecure
+            .post(`/blogs/${id}/like`, blogLike)
+            .then((response) => {
+                console.log(response.data);
+                // if already liked, delete like
+                if (response.data.details === "Already liked") {
+                    axiosSecure
+                        .delete(`/blogs/${id}/like`, {
+                            data: blogLike,
+                            headers: { "Content-Type": "application/json" },
+                        })
+                        .then((response) => {
+                            console.log(response.data);
+                            setLikes(likes - 1); // decrement likes
+                            notifyError("Unliked the post");
+                        });
+                } else {
+                    setLikes(likes + 1); // increment likes
+                    notifySuccess("Liked the post");
+                }
+            })
+    };
+
+    const [comment, setComment] = useState("");
+
+    const handleComment = () => {
+        const commentData = {
+            commentcontent: comment,
+            uid: userInfo._id,
+            blogid: id,
+        };
+        setLoading(true);
+        axiosSecure
+            .post(`/blogs/${id}/comment`, commentData)
+            .then((response) => {
+                console.log(response.data);
+                notifySuccess("Comment posted successfully");
+            })
+            .catch((error) => {
+                notifyError("Failed to post comment");
+            })
+            .finally(() => {
+                setLoading(false);
             });
-        });
+
+        setBlogComments([
+            ...blogComments,
+            {
+                comment: {
+                    _id: Math.random(),
+                    uid: userInfo._id,
+                    blogid: id,
+                    commentcontent: comment,
+                    created_at: new Date().toLocaleString(),
+                    updated_at: null,
+                },
+                user_info: {
+                    _id: userInfo._id,
+                    name: userInfo.name,
+                    email: userInfo.email,
+                    profilepic: userInfo.profilepic,
+                },
+            },
+        ]);
+        setComment("");
+    };
+
+    if(loading){
+        return <Loader/>
     }
+
+    const handleDeleteComment = (comment) => {
+        console.log(comment);
+        const commentbody = {
+            uid: comment.uid,
+            blogid: comment.blogid,
+            cid: comment._id,
+            commentcontent: comment.commentcontent,
+        };
+        console.log(commentbody);
+        axiosSecure
+            .delete(`/blogs/${comment.blogid}/comment/`, {
+                data: commentbody,
+                headers: { "Content-Type": "application/json" },
+            })
+            .then((response) => {
+                console.log(response.data);
+                notifySuccess("Comment deleted successfully");
+            })
+            .catch((error) => {
+                notifyError("Failed to delete comment");
+            });
+        setBlogComments(
+            blogComments.filter(
+                (currentComments) => currentComments._id !== comment._id
+            )
+        );
+    };
 
     return (
         <>
@@ -76,8 +182,11 @@ const BlogPage = () => {
                         <p>{blogDetails?.blog?.comments.length}</p>
                     </div>
                     <div className="flex items-center">
-                        <FaThumbsUp className="mr-1 text-xl" onClick={handleLike}/>
-                        <p>{blogDetails?.blog?.likes.length}</p>
+                        <FaThumbsUp
+                            className="mr-1 text-xl"
+                            onClick={handleLike}
+                        />
+                        <p>{likes}</p>
                     </div>
                 </div>
                 {/* all comments */}
@@ -91,21 +200,23 @@ const BlogPage = () => {
                         <textarea
                             type="text"
                             placeholder="Comment"
+                            onChange={(e) => setComment(e.target.value)}
                             className="w-full p-2 border border-gray-300 rounded-lg"
                         />
                     </div>
-                    <button className="mt-4 px-3 py-2 bg-accent text-white font-bold w-fit rounded-full">
+                    <button
+                        className="mt-4 px-3 py-2 bg-accent text-white font-bold w-fit rounded-full"
+                        onClick={handleComment}
+                    >
                         Post Comment
                     </button>
                 </div>
-                {blogDetails?.blog?.comments.map((comment) => {
+                {blogComments.map((comment) => {
                     return (
                         <CommentBox
-                            key={comment._id}
-                            author={comment.user.name}
-                            content={comment.content}
-                            date={comment.created_at}
-                            authorProfilePic={comment.user.profilepic}
+                            key={comment.comment._id}
+                            comment={comment}
+                            handleDeleteComment={handleDeleteComment}
                         />
                     );
                 })}

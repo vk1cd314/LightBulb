@@ -182,7 +182,7 @@ async def like_blog(blog_id: str, liker:Like,
     alreadyLiked = await like_collection.find_one({"blogid": blog_id, "uid": liker.uid})
     print(alreadyLiked)
     if alreadyLiked is not None:
-        raise exception.AlreadyLiked
+        return {"details": "Already liked"}
     
     likes = like_collection
     result = await likes.insert_one(liker.dict(by_alias=True))
@@ -227,6 +227,21 @@ async def unlike_blog(blog_id: str, liker:Like,
         
     return liker.dict(by_alias=True)
 
+@router.get("/{blog_id}/commentlist")
+async def get_blog_comments(blog_id: str, 
+                            blog_collection = Depends(get_blog_collection),
+                            comments_collection = Depends(get_comment_collection),
+                            user_collection = Depends(get_user_collection)):
+    res = []
+    blog = await blog_collection.find_one({"_id": blog_id})
+    if blog and "comments" in blog:
+        for comment_id in blog["comments"]:
+            comment_info = await get_comment_with_user_info(comment_id, 
+                                                            comments_collection=comments_collection, 
+                                                            user_collection=user_collection)
+            res.append(comment_info)
+    return res
+
 @router.post("/{blog_id}/comment", response_model=Comment)
 async def comment_blog(blog_id: str, commenter: Comment, 
                        blog_collection=Depends(get_blog_collection), 
@@ -256,15 +271,16 @@ async def uncomment_blog(blog_id: str, commenter: Comment,
                          blog_collection=Depends(get_blog_collection), 
                          comment_collection=Depends(get_comment_collection)):
     if commenter is None or blog_id != commenter.blogid:
+        print(commenter.blogid + " " +blog_id)
         raise exception.BadRequest
     
     blog = await blog_collection.find_one({"_id": blog_id})
     if blog is None:
         raise exception.NotFound
     
-    to_remove = await comment_collection.find_one({"_id": commenter.cid, "uid": commenter.uid})
-    if to_remove is None:
-        raise exception.NotFound
+    # to_remove = await comment_collection.find_one({"_id": commenter.cid, "uid": commenter.uid})
+    # if to_remove is None:
+    #     raise exception.NotFound
     
     blog["comments"].remove(commenter.cid)
     blog_dict = blog.copy()

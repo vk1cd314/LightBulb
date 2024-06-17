@@ -5,12 +5,14 @@ import useAxiosSecure from "../../hooks/useAxiosSecure";
 import { useLocation } from "react-router-dom";
 import { AuthContext } from "../../Auth/AuthProvider";
 import { useNavigate } from "react-router-dom/dist";
+import { MessageContext } from "../../pages/Root";
 
 const CreateBlog = () => {
     const [content, setContent] = useState("");
     const [title, setTitle] = useState("");
     const [preview, setPreview] = useState(""); // State to hold rendered HTML preview
     const { userInfo } = useContext(AuthContext);
+    const { notifySuccess, notifyError } = useContext(MessageContext);
 
     // Custom Axios instance for secure requests
     const axiosSecure = useAxiosSecure();
@@ -114,8 +116,10 @@ const CreateBlog = () => {
                 axiosSecure.post("/blogs", newBlog).then((response) => {
                     console.log(response.data);
                     navigate(`/b/${response.data._id}`);
+                    notifySuccess("Blog published successfully");
                 }).catch((error) => {
                     console.error(error);
+                    notifyError("Failed to publish blog");
                 });
             }
         });

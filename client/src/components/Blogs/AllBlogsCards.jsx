@@ -9,23 +9,40 @@ const AllBlogsCards = () => {
     const [blogs, setBlogs] = useState([]);
     const axiosSecure = useAxiosSecure();
     const { userInfo } = useContext(AuthContext);
+    const [loading , setLoading] = useState(false);
 
     useEffect(() => {
         if (location.pathname === "/blogs/explore") {
+            setLoading(true);
             axiosSecure.get("/blogs/1/allblogs").then((response) => {
                 setBlogs(response.data.blogs);
                 console.log(response.data.blogs);
+            }).finally(() => {
+                setLoading(false);
             });
+
         }
 
         if (location.pathname === "/blogs/my-blogs" && userInfo._id) {
             // fetch user blogs
+            setLoading(true);
             axiosSecure.get(`/blogs/${userInfo._id}/users`).then((response) => {
                 setBlogs(response.data.blogs);
                 console.log(response.data.blogs);
+            }).then(() => {
+                setLoading(false);
             });
         }
     }, [location]);
+
+    if(loading) {
+        return (
+            <div className="flex justify-center items-center mt-10">
+                <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
+            </div>
+        );
+    }
+
     return (
         <div className="flex flex-col items-center mt-10 space-y-3">
             { blogs.map((blog) => {
