@@ -23,6 +23,7 @@ import Home from "./pages/Home";
 import BlogPage from "./pages/BlogPage";
 import CommunityPage from "./pages/CommunityPage";
 import PostPage from "./pages/PostPage";
+import UserProfiles from "./pages/UserProfiles";
 
 const router = createBrowserRouter([
     {
@@ -101,6 +102,10 @@ const router = createBrowserRouter([
             {
                 path: "/profile",
                 element: <PrivateRoute><Profile /></PrivateRoute>,
+            },
+            {
+                path: "/profile/:id",
+                element: <UserProfiles />,
             },
             {
                 path: "/create-community",
