@@ -27,6 +27,9 @@ const SearchBar = () => {
                 setIsDropdownOpen(true);
             });
         }
+        // clear search bar
+        setBlogs([]);
+        setUsers([]);
     };
 
     const handleClickOutside = (event) => {
