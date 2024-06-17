@@ -107,7 +107,7 @@ async def get_blogs(collection=Depends(get_blog_collection)):
         blogs.append(blog)
     return blogs
 
-@router.get("{user_id}/allblogs")
+@router.get("/{user_id}/allblogs")
 async def get_all_blogs(user_id: str, blog_collection=Depends(get_blog_collection), user_collection=Depends(get_user_collection)):
     res = []
     async for blog in blog_collection.find():
