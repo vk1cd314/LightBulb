@@ -37,38 +37,66 @@ const CreateBlog = () => {
         return html;
     };
 
-    // Function to handle preview button click
     const handlePreview = (callback) => {
-        const tikzPictureRegex =
-            /\\begin{tikzpicture}[\s\S]*?\\end{tikzpicture}/g;
+        const tikzPictureRegex = /\\begin{tikzpicture}[\s\S]*?\\end{tikzpicture}/g;
         const tikzPictures = content.match(tikzPictureRegex);
-
+        console.log(tikzPictures);
+    
+        let updatedContent = content;
+        const base64Images = new Array(tikzPictures ? tikzPictures.length : 0);
+    
         if (tikzPictures && tikzPictures.length > 0) {
-            axiosSecure
-                .post("/blogs/generate", {
-                    tikz_code: tikzPictures[0].toString(),
-                })
-                .then((response) => {
-                    const base64Image = response.data.base64_image;
-
-                    // Replace the TikZ picture with the image tag decoding the base64
-                    const updatedContent = content.replace(
-                        tikzPictureRegex,
-                        `<img src="data:image/png;base64,${base64Image}" />`
-                    );
-
-                    // Set the preview state to display the updated content
-                    setPreview(renderLatex(updatedContent));
-                callback();
-            })
-            .catch((error) => {
-                console.error("Error fetching image:", error);
+            let processedCount = 0;
+    
+            tikzPictures.forEach((tikzPicture, index) => {
+                axiosSecure
+                    .post("/blogs/generate", {
+                        tikz_code: tikzPicture.toString(),
+                    })
+                    .then((response) => {
+                        const base64Image = response.data.base64_image;
+                        base64Images[index] = base64Image;
+                        processedCount++;
+    
+                        // If all images have been processed, perform the replacement
+                        if (processedCount === tikzPictures.length) {
+                            base64Images.forEach((image, i) => {
+                                updatedContent = updatedContent.replace(
+                                    tikzPictures[i],
+                                    `<img src="data:image/png;base64,${image}" />`
+                                );
+                            });
+    
+                            // Set the preview state to display the updated content
+                            setPreview(renderLatex(updatedContent));
+                            callback();
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error fetching image:", error);
+                        processedCount++;
+    
+                        // If all images have been processed, even with errors, perform the replacement
+                        if (processedCount === tikzPictures.length) {
+                            base64Images.forEach((image, i) => {
+                                updatedContent = updatedContent.replace(
+                                    tikzPictures[i],
+                                    `<img src="data:image/png;base64,${image || ''}" />`
+                                );
+                            });
+    
+                            // Set the preview state to display the updated content
+                            setPreview(renderLatex(updatedContent));
+                            callback();
+                        }
+                    });
             });
-    } else {
-        setPreview(renderLatex(content));
-        callback();
-    }
+        } else {
+            setPreview(renderLatex(content));
+            callback();
+        }
     };
+    
 
     const location = useLocation();
     const navigate = useNavigate();
