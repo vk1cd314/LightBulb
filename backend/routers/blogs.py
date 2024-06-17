@@ -159,7 +159,7 @@ async def get_community_blogs(community_id: str, blog_collection=Depends(get_blo
     }
     return result
 
-@router.post("/{blog_id}/like",response_model=Like)
+@router.post("/{blog_id}/like")
 async def like_blog(blog_id: str, liker:Like, 
                     blog_collection=Depends(get_blog_collection), 
                     like_collection=Depends(get_like_collection)):
@@ -177,7 +177,7 @@ async def like_blog(blog_id: str, liker:Like,
     for like_str in blog["likes"]:
         like = await like_collection.find_one({"_id": like_str})
         if like["uid"] == liker.uid:
-            raise exception.AlreadyLiked
+            return {"details": "Already liked"}
     
     alreadyLiked = await like_collection.find_one({"blogid": blog_id, "uid": liker.uid})
     print(alreadyLiked)
@@ -192,7 +192,9 @@ async def like_blog(blog_id: str, liker:Like,
     blog_dict = blog.copy()
     blog_dict.pop("_id", None)
     blog_collection.replace_one({"_id": blog_id}, blog_dict)
-    return liker.dict(by_alias=True)
+    liker_dict = liker.dict(by_alias=True)
+    liker_dict["details"] = "First Like"
+    return liker_dict
 
 @router.delete("/{blog_id}/like",response_model=Like)
 async def unlike_blog(blog_id: str, liker:Like, 
