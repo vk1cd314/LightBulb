@@ -266,8 +266,8 @@ async def comment_blog(blog_id: str, commenter: Comment,
 
     return commenter.dict(by_alias=True)
 
-@router.delete("/{blog_id}/comment", response_model=Comment)
-async def uncomment_blog(blog_id: str, commenter: Comment, 
+@router.delete("/{blog_id}/{comment_id}/comment", response_model=Comment)
+async def uncomment_blog(blog_id: str, comment_id: str, commenter: Comment, 
                          blog_collection=Depends(get_blog_collection), 
                          comment_collection=Depends(get_comment_collection)):
     if commenter is None or blog_id != commenter.blogid:
@@ -278,15 +278,17 @@ async def uncomment_blog(blog_id: str, commenter: Comment,
     if blog is None:
         raise exception.NotFound
     
-    # to_remove = await comment_collection.find_one({"_id": commenter.cid, "uid": commenter.uid})
-    # if to_remove is None:
-    #     raise exception.NotFound
+    to_remove = await comment_collection.find_one({"_id": comment_id, "uid": commenter.uid})
+    if to_remove is None:
+        raise exception.NotFound
     
-    blog["comments"].remove(commenter.cid)
+    print(blog["comments"])
+    print(comment_id)
+    blog["comments"].remove(comment_id)
     blog_dict = blog.copy()
     blog_dict.pop("_id", None)
     await blog_collection.replace_one({"_id": blog_id}, blog_dict)
-    await comment_collection.delete_one({"_id": commenter.cid})
+    await comment_collection.delete_one({"_id": comment_id})
 
     return commenter.dict(by_alias=True)
 

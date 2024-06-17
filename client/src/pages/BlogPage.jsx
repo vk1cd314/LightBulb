@@ -93,25 +93,16 @@ const BlogPage = () => {
                 setLoading(false);
             });
 
-        setBlogComments([
-            ...blogComments,
-            {
-                comment: {
-                    _id: Math.random(),
-                    uid: userInfo._id,
-                    blogid: id,
-                    commentcontent: comment,
-                    created_at: new Date().toLocaleString(),
-                    updated_at: null,
-                },
-                user_info: {
-                    _id: userInfo._id,
-                    name: userInfo.name,
-                    email: userInfo.email,
-                    profilepic: userInfo.profilepic,
-                },
-            },
-        ]);
+        //refetch comments
+        setLoading(true);
+        axiosSecure
+            .get(`/blogs/${id}/commentlist`)
+            .then((response) => {
+                setBlogComments(response.data);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
         setComment("");
     };
 
@@ -129,7 +120,7 @@ const BlogPage = () => {
         };
         console.log(commentbody);
         axiosSecure
-            .delete(`/blogs/${comment.blogid}/comment/`, {
+            .delete(`/blogs/${comment.blogid}/${comment._id}/comment/`, {
                 data: commentbody,
                 headers: { "Content-Type": "application/json" },
             })
