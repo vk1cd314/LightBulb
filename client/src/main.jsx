@@ -62,10 +62,6 @@ const router = createBrowserRouter([
                 element: <CreateBlog></CreateBlog>,
             },
             {
-                path: "/notifications",
-                element: <div className="mt-20">Notifications</div>,
-            },
-            {
                 path: "/b/:id",
                 element: <BlogPage></BlogPage>,
             },

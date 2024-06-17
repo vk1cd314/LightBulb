@@ -35,7 +35,7 @@ const SearchBar = () => {
         <div className="flex justify-center lg:flex-row items-center gap-4 relative" ref={searchRef}>
             <input
                 type="text"
-                placeholder="Search Products"
+                placeholder="Search Blogs"
                 className="p-2 rounded-lg bg-gray-100 text-primary border-2 border-primary"
                 value={searchParam}
                 onChange={(e) => setSearchParam(e.target.value)}

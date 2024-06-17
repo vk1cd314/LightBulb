@@ -39,7 +39,7 @@ const UserProfiles = () => {
             .post(`/users/follow`, { uid1: currentUser._id, uid2: userId })
             .then((response) => {
                 console.log(response.data);
-                notifySuccess("User Followed");
+                notifySuccess("Information updated successfully");
                 // refetch user data
                 axiosSecure
                     .get(`/users/${userId}/userdata`)
@@ -108,7 +108,7 @@ const UserProfiles = () => {
                             className="my-5 bg-primary text-white px-5 py-2 rounded-lg hover:bg-accent"
                             onClick={handleFollow}
                         >
-                            Follow
+                            Follow | Unfollow
                         </button>
                     </div>
                 </div>
