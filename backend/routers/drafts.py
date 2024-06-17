@@ -30,7 +30,7 @@ async def get_draft(draftid: str, collection=Depends(get_drafts_collection)):
     else:
         raise exception.NotFound
 
-@router.get("/{uid}", response_model=List[Draft])
+@router.get("/{uid}/drafts", response_model=List[Draft])
 async def get_user_drafts(uid: str, collection=Depends(get_drafts_collection)):
     cursor = collection.find({"uid": uid})
     drafts = await cursor.to_list(length=100)
