@@ -104,9 +104,17 @@ async def leave_community(community_id: str, user_id: str,
     return Community(**community)
 
 
-@router.get("/recommended", response_model=list[Community])
-async def get_recommended_communities(topic: str, collection=Depends(get_communities_collection)):
+@router.get("/{topic}/recommended", response_model=list[Community])
+async def get_recommended_communities(topic: str, collection = Depends(get_communities_collection)):
+    query = {"topic": topic}
+    sort_criteria = [("memberlist", -1)]  # Sort by the length of memberlist in descending order
+
+    # Execute the query with sorting
+    cursor = collection.find(query).sort(sort_criteria)
+
     communities = []
-    async for community in collection.find({"topic": topic}).sort(lambda x: len(x["memberlist"]),-1):
+    async for community_dict in cursor:
+        community = Community(**community_dict)
         communities.append(community)
+    
     return communities

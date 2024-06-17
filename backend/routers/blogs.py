@@ -107,11 +107,10 @@ async def get_blogs(collection=Depends(get_blog_collection)):
         blogs.append(blog)
     return blogs
 
-@router.get("/allblogs")
-async def get_all_blogs(user_collection=Depends(get_user_collection)):
-    blogs = get_blogs()
+@router.get("{user_id}/allblogs")
+async def get_all_blogs(user_id: str, blog_collection=Depends(get_blog_collection), user_collection=Depends(get_user_collection)):
     res = []
-    for blog in blogs:
+    async for blog in blog_collection.find():
         user = await user_collection.find_one({"_id": blog["uid"]})
         minires = {
             "blog": blog,
@@ -328,12 +327,33 @@ async def search_blogs(search_query: str, collection=Depends(get_blog_collection
         blogs.append(blog)
     return blogs
 
-@router.get("/trending",response_model=list[Blog])
-async def get_trending_blogs(collection=Depends(get_blog_collection)):
+@router.get("/{user_id}/trending",response_model=list[Blog])
+async def get_trending_blogs(user_id: str, collection = Depends(get_blog_collection)) :
+    pipeline = [
+        {
+            '$project': {
+                'uid': 1,
+                'title': 1,
+                'commid': 1,
+                'content': 1,
+                'comments': 1,
+                'likes': 1,
+                'created_at': 1,
+                'updated_at': 1,
+                'score': {'$add': [{'$multiply': [{'$size': '$likes'}, 3]}, {'$multiply': [{'$size': '$comments'}, 2]}]}
+            }
+        },
+        {'$sort': {'score': -1}}  # Sort by the computed score in descending order
+    ]
+
+    # Execute the aggregation pipeline
+    cursor = collection.aggregate(pipeline)
+
     blogs = []
-    print(collection.find())
-    async for blog in collection.find().sort(lambda x:len(x["likes"])*3 + 2*len(x["comments"]), -1):
+    async for blog_dict in cursor:
+        blog = Blog(**blog_dict)
         blogs.append(blog)
+    
     return blogs
 
 @router.get("/{blog_id}/details")
