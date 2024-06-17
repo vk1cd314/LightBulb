@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import useAxiosSecure from "../hooks/useAxiosSecure";
 import Communities from "./Communities";
 import Loader from "../components/FunctionalComponents/Loader";
+import SearchBar from "../components/Shared/SearchBar";
 
 const Profile = () => {
     const { userInfo } = useContext(AuthContext);
@@ -47,7 +48,8 @@ const Profile = () => {
                         {/* replace with actual about from db */}
                         <p>{profileData?.user?.about}</p>
                     </div>
-                    <div className="flex flex-col items-center justify-center">
+                    <div className="flex flex-col items-center justify-center gap-5">
+                        {/* <SearchBar/> */}
                         <div className="grid grid-cols-2 gap-5">
                             {/* replace with stats for each */}
                             <ProfileStats

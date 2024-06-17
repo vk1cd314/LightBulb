@@ -36,7 +36,7 @@ const HeaderCard = ({
                 </Link>
             </div>
             <Link to={`/b/${blogid}`}>
-                <h1 className="font-bold text-xl">
+                <h1 className="font-bold text-2xl underline underline-offset-4 my-2">
                     {`${title}`.substring(0, 80)}
                 </h1>
 

@@ -1,7 +1,7 @@
 import { BiComment } from "react-icons/bi";
 import { FaThumbsUp } from "react-icons/fa6";
 import CommentBox from "../components/Shared/CommentBox";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import useAxiosSecure from "../hooks/useAxiosSecure";
 import { AuthContext } from "../Auth/AuthProvider";
@@ -141,7 +141,7 @@ const BlogPage = () => {
                 <h1 className="text-4xl font-bold text-center mt-20">
                     {blogDetails?.blog?.title}
                 </h1>
-                <div className="flex justify-center my-5">
+                <Link to={`/profile/${blogDetails?.blog?.uid}`} className="flex justify-center my-5">
                     <img
                         className="rounded-full size-12"
                         src={blogDetails?.user?.profilepic}
@@ -152,7 +152,7 @@ const BlogPage = () => {
                             {blogDetails?.blog?.created_at}
                         </p>
                     </div>
-                </div>
+                </Link>
             </div>
             <div className="min-h-dvh max-w-5xl mx-auto">
                 <hr className="my-5 border border-gray-300" />

@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import { useContext } from "react";
 import { AuthContext } from "../../Auth/AuthProvider";
+import { Link } from "react-router-dom";
 
 const ReplyBox = () => {
     return (
@@ -21,22 +22,24 @@ const CommentBox = ({comment, handleDeleteComment}) => {
 
     return (
         <div className="mt-10 w-full border-2 border-gray-300 p-3 rounded-2xl flex gap-5">
-            <img
-                className="rounded-full size-12"
-                src={comment.user_info.profilepic}
-            />
+            <Link to={`/profile/${comment?.user_info?._id}`}>
+                <img
+                    className="rounded-full size-12"
+                    src={comment?.user_info.profilepic}
+                />
+            </Link>
             <div className="w-full">
                 <div>
                     <h1 className="font-bold">{comment.user_info.name}</h1>
-                    <p>{comment.comment.created_at}</p>
+                    <p>{comment?.comment.created_at}</p>
                 </div>
                 <hr className="my-5 border border-gray-300" />
-                <p>{comment.comment.commentcontent}</p>
+                <p>{comment?.comment.commentcontent}</p>
 
                 {
-                    userInfo._id === comment.user_info._id && (
+                    userInfo._id === comment?.user_info._id && (
                         <div className="flex my-3">
-                            <button className="text-gray-500 text-sm hover:cursor-pointer font-bold underline underline-offset-4" onClick={() => handleDeleteComment(comment.comment)}>Delete</button>
+                            <button className="text-gray-500 text-sm hover:cursor-pointer font-bold underline underline-offset-4" onClick={() => handleDeleteComment(comment?.comment)}>Delete</button>
                         </div>
                     )
                 }

@@ -12,6 +12,7 @@ const UserProfiles = () => {
     const [userInfo, setUserInfo] = useState({});
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
+    const [alreadyFollowing, setAlreadyFollowing] = useState(false);
 
     const { userInfo: currentUser } = useContext(AuthContext);
     const { notifySuccess, notifyError } = useContext(MessageContext);
@@ -22,11 +23,21 @@ const UserProfiles = () => {
 
     useEffect(() => {
         setLoading(true);
-        axiosSecure
-            .get(`/users/${userId}/userdata`)
-            .then((response) => {
-                setUserInfo(response.data);
-                console.log(response.data);
+        Promise.all([
+            axiosSecure.get(`/users/${userId}/userdata`),
+            axiosSecure.post(`/users/followingtype`, {
+                uid1: currentUser._id,
+                uid2: userId,
+            }),
+        ])
+            .then(([userDataResponse, followingTypeResponse]) => {
+                setUserInfo(userDataResponse.data);
+                setAlreadyFollowing(followingTypeResponse.data.details);
+                console.log(
+                    followingTypeResponse.data.details,
+                    " ",
+                    userDataResponse.data
+                );
             })
             .finally(() => {
                 setLoading(false);
@@ -39,20 +50,28 @@ const UserProfiles = () => {
             .post(`/users/follow`, { uid1: currentUser._id, uid2: userId })
             .then((response) => {
                 console.log(response.data);
-                notifySuccess("Information updated successfully");
+                if (response.data.detail === "Successfully unfollowed") {
+                    setAlreadyFollowing(false);
+                } else {
+                    setAlreadyFollowing(true);
+                }
+                alreadyFollowing
+                    ? notifySuccess("Unfollowed user")
+                    : notifySuccess("Followed user");
                 // refetch user data
                 axiosSecure
                     .get(`/users/${userId}/userdata`)
                     .then((response) => {
                         setUserInfo(response.data);
-                        console.log(response.data);
                     });
             })
             .catch((error) => {
                 console.error(error);
-                notifyError("Failed to follow user");
+                alreadyFollowing
+                    ? notifyError("Failed to unfollow user")
+                    : notifyError("Failed to follow user");
             })
-            .then(() => {
+            .finally(() => {
                 setLoading(false);
             });
     };
@@ -105,10 +124,10 @@ const UserProfiles = () => {
                             ></ProfileStats>
                         </div>
                         <button
-                            className="my-5 bg-primary text-white px-5 py-2 rounded-lg hover:bg-accent"
                             onClick={handleFollow}
+                            className="px-3 py-2 bg-primary hover:bg-accent text-white font-bold w-fit rounded-lg mt-5"
                         >
-                            Follow | Unfollow
+                            {alreadyFollowing ? "Unfollow" : "Follow"}
                         </button>
                     </div>
                 </div>
