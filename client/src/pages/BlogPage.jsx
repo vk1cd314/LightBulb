@@ -17,6 +17,7 @@ const BlogPage = () => {
     const [blogComments, setBlogComments] = useState([]);
     const { userInfo } = useContext(AuthContext);
     const [likes, setLikes] = useState(0);
+    const [commentCount, setCommentCount] = useState(0);
     const { notifySuccess, notifyError } = useContext(MessageContext);
     const [loading, setLoading] = useState(false);
 
@@ -31,6 +32,7 @@ const BlogPage = () => {
                 console.log(detailsResponse.data);
                 setBlogDetails(detailsResponse.data);
                 setLikes(detailsResponse.data.blog.likes.length);
+                setCommentCount(detailsResponse.data.blog.comments.length);
 
                 console.log(commentsResponse.data);
                 setBlogComments(commentsResponse.data);
@@ -85,6 +87,13 @@ const BlogPage = () => {
             .then((response) => {
                 console.log(response.data);
                 notifySuccess("Comment posted successfully");
+                setCommentCount(commentCount + 1);
+                // refetch comments
+                return axiosSecure.get(`/blogs/${id}/commentlist`);
+
+            })
+            .then((response) => {
+                setBlogComments(response.data);
             })
             .catch((error) => {
                 notifyError("Failed to post comment");
@@ -92,17 +101,7 @@ const BlogPage = () => {
             .finally(() => {
                 setLoading(false);
             });
-
-        //refetch comments
-        setLoading(true);
-        axiosSecure
-            .get(`/blogs/${id}/commentlist`)
-            .then((response) => {
-                setBlogComments(response.data);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
+    
         setComment("");
     };
 
@@ -111,7 +110,6 @@ const BlogPage = () => {
     }
 
     const handleDeleteComment = (comment) => {
-        console.log(comment);
         const commentbody = {
             uid: comment.uid,
             blogid: comment.blogid,
@@ -125,16 +123,14 @@ const BlogPage = () => {
                 headers: { "Content-Type": "application/json" },
             })
             .then((response) => {
-                console.log(response.data);
                 notifySuccess("Comment deleted successfully");
+                setCommentCount(commentCount - 1);
             })
             .catch((error) => {
                 notifyError("Failed to delete comment");
             });
         setBlogComments(
-            blogComments.filter(
-                (currentComments) => currentComments._id !== comment._id
-            )
+            blogComments.filter((blogComment) => blogComment.comment._id !== comment._id)
         );
     };
 
@@ -170,7 +166,7 @@ const BlogPage = () => {
                 <div className="flex gap-10">
                     <div className="flex items-center">
                         <BiComment className="mr-1 text-xl" />
-                        <p>{blogDetails?.blog?.comments.length}</p>
+                        <p>{commentCount}</p>
                     </div>
                     <div className="flex items-center">
                         <FaThumbsUp

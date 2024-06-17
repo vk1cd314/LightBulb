@@ -61,6 +61,12 @@ const Profile = () => {
                     >
                         My Communities
                     </Link>
+                    <Link
+                        to="/blogs/my-blogs"
+                        className="bg-primary text-white px-5 py-2 rounded-lg ml-5 hover:bg-accent"
+                    >
+                        My Blogs
+                    </Link>
                 </div>
             </div>
         </div>
