@@ -70,7 +70,7 @@ const AllBlogsCards = () => {
 
     if (blogs.length === 0) {
         return (
-            <div className="flex flex-col justify-center items-center mt-10">
+            <div className="flex flex-col justify-center items-center min-h-[calc(100dvh-200px)]">
                 <p className="text-2xl font-bold">No blogs to show</p>
             </div>
         );
