@@ -16,6 +16,12 @@ def get_users_collection() -> Collection:
 def get_following_collection() -> Collection:
     return get_collection('following')
 
+def get_blog_collection() -> Collection:
+    return get_collection('blogs')
+
+def get_community_collection() -> Collection:
+    return get_collection('communities')
+
 @router.post("/", response_model=User)
 async def create_user(user: User, collection=Depends(get_users_collection)):
     existing_user = await collection.find_one({"email": user.email})
@@ -94,30 +100,67 @@ async def search_users(query: str, collection: Collection = Depends(get_users_co
         raise exception.ServerException
 
 @router.get("/following/{uid}", response_model=List[User])
-async def get_following(uid: str):
-    followings = get_following_collection().find({"uid1": uid})
+async def get_following(uid: str, collection=Depends(get_following_collection), user_collection=Depends(get_users_collection)):
+    followings = collection.find({"uid1": uid})
     following_uids = [following["uid2"] for following in await followings.to_list(length=None)]
     
-    users = await get_users_collection().find({"_id": {"$in": following_uids}}).to_list(length=None)
+    users = await user_collection.find({"_id": {"$in": following_uids}}).to_list(length=None)
     return users
 
 @router.get("/followers/{uid}", response_model=List[User])
-async def get_followers(uid: str):
-    followers = get_following_collection().find({"uid2": uid})
+async def get_followers(uid: str, collection=Depends(get_following_collection), user_collection=Depends(get_users_collection)):
+    followers = collection.find({"uid2": uid})
     follower_uids = [follower["uid1"] for follower in await followers.to_list(length=None)]
     
-    users = await get_users_collection().find({"_id": {"$in": follower_uids}}).to_list(length=None)
+    users = await user_collection.find({"_id": {"$in": follower_uids}}).to_list(length=None)
     return users
 
 
 @router.post("/follow", response_model=Following)
-async def follow(following: Following):
-    if not await get_users_collection().find_one({"_id": following.uid1}):
+async def follow(following: Following, user_collection=Depends(get_users_collection), following_collection=Depends(get_following_collection)):
+    if not await user_collection.find_one({"_id": following.uid1}):
         raise exception.UserNotFound
-    if not await get_users_collection().find_one({"_id": following.uid2}):
+    if not await user_collection.find_one({"_id": following.uid2}):
         raise exception.UserNotFound
-    if await get_following_collection().find_one({"uid1": following.uid1, "uid2": following.uid2}):
+    if await following_collection.find_one({"uid1": following.uid1, "uid2": following.uid2}):
         raise exception.AlreadyFollowing
 
-    result = await get_following_collection().insert_one(following.dict())
+    result = await following_collection.insert_one(following.dict())
     return following
+
+@router.get("/{uid}/userdata")
+async def get_user_data(uid: str, user_collection=Depends(get_users_collection), following_collection=Depends(get_following_collection)):
+    user = await user_collection.find_one({"_id": uid})
+    if user is None:
+        raise exception.UserNotFound
+
+    communities = await user_collection.aggregate([
+        {"$match": {"_id": uid}},
+        {"$lookup": {
+            "from": "communities",
+            "localField": "communities",
+            "foreignField": "_id",
+            "as": "communities"
+        }}
+    ]).to_list(length=None)
+
+    blogs = await user_collection.aggregate([
+        {"$match": {"_id": uid}},
+        {"$lookup": {
+            "from": "blogs",
+            "localField": "blogs",
+            "foreignField": "blogid",
+            "as": "blogs"
+        }}
+    ]).to_list(length=None)
+
+    following = await following_collection.find({"uid1": uid}).to_list(length=None)
+    followers = await following_collection.find({"uid2": uid}).to_list(length=None)
+
+    return {
+        "user": User(**user),
+        "communities": communities[0].get("communities", []),
+        "blogs": blogs[0].get("blogs", []),
+        "following": [following["uid2"] for following in following],
+        "followers": [follower["uid1"] for follower in followers]
+    }
