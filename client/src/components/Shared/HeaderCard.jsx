@@ -39,31 +39,30 @@ const HeaderCard = ({
                 <h1 className="font-bold text-2xl underline underline-offset-4 my-2">
                     {`${title}`.substring(0, 80)}
                 </h1>
-
-                {/* likes and comments */}
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                        <div className="flex items-center mr-5">
-                            <BiComment className="mr-1" />
-                            <p>{comments.length}</p>
-                        </div>
-                        <div className="flex items-center">
-                            <FaThumbsUp className="mr-1" />
-                            <p>{likes.length}</p>
-                        </div>
-                    </div>
-                    {/* delete button */}
-                    {userInfo._id === authorid &&
-                        location.pathname === "/blogs/my-blogs" && (
-                            <button
-                                className="text-white text-sm hover:cursor-pointer font-bold bg-red-500 px-2 py-1 rounded-2xl"
-                                onClick={() => handleDelete(blogid)}
-                            >
-                                Delete
-                            </button>
-                        )}
-                </div>
             </Link>
+            {/* likes and comments */}
+            <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                    <div className="flex items-center mr-5">
+                        <BiComment className="mr-1" />
+                        <p>{comments.length}</p>
+                    </div>
+                    <div className="flex items-center">
+                        <FaThumbsUp className="mr-1" />
+                        <p>{likes.length}</p>
+                    </div>
+                </div>
+                {/* delete button */}
+                {userInfo._id === authorid &&
+                    location.pathname === "/blogs/my-blogs" && (
+                        <button
+                            className="text-white text-sm hover:cursor-pointer font-bold bg-red-500 px-2 py-1 rounded-2xl"
+                            onClick={() => handleDelete(blogid)}
+                        >
+                            Delete
+                        </button>
+                    )}
+            </div>
         </div>
     );
 };
