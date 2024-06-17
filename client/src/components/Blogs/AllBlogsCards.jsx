@@ -12,29 +12,33 @@ const AllBlogsCards = () => {
 
     useEffect(() => {
         if (location.pathname === "/blogs/explore") {
-            axiosSecure.get("/blogs").then((response) => {
-                setBlogs(response.data);
+            axiosSecure.get("/blogs/1/allblogs").then((response) => {
+                setBlogs(response.data.blogs);
+                console.log(response.data.blogs);
             });
         }
 
-        if (location.pathname === "/blogs/my-blogs") {
+        if (location.pathname === "/blogs/my-blogs" && userInfo._id) {
             // fetch user blogs
             axiosSecure.get(`/blogs/${userInfo._id}/users`).then((response) => {
-                setBlogs(response.data);
-                console.log(response.data);
+                setBlogs(response.data.blogs);
+                console.log(response.data.blogs);
             });
         }
     }, [location]);
     return (
         <div className="flex flex-col items-center mt-10 space-y-3">
-            {blogs.map((blog) => {
+            { blogs.map((blog) => {
                 return (
                     <HeaderCard
-                        key={blog._id}
-                        title={blog.title}
-                        author={blog.author}
-                        date={blog.date}
-                        id={blog._id}
+                        key={blog.blog._id}
+                        title={blog.blog.title}
+                        author={blog.user.name}
+                        date={blog.blog.updated_at || blog.blog.created_at}
+                        id={blog.blog._id}
+                        likes={blog.blog.likes}
+                        comments={blog.blog.comments}
+                        authorProfilePic={blog.user.profilepic}
                     />
                 );
             })}

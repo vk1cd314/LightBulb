@@ -25,6 +25,9 @@ def get_reply_collection():
 def get_user_collection():
     return get_collection('users')
 
+def get_community_collection():
+    return get_collection('communities')
+
 
 @router.post("/",response_model=Blog)
 async def create_blog(blog: Blog, collection=Depends(get_blog_collection), community_collection=Depends(get_community_collection)):
