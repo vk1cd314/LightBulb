@@ -16,13 +16,14 @@ const Register = () => {
         loading,
         googleLogin,
         setLoading,
+        setUserInfo,
     } = useContext(AuthContext);
     const { notifySuccess, notifyError } = useContext(MessageContext);
     const navigate = useNavigate();
 
     const [password, setPassword] = useState("");
     const [confirmation, setConfirmation] = useState("");
-    
+
     const axiosSecure = useAxiosSecure();
 
     useEffect(() => {
@@ -65,7 +66,6 @@ const Register = () => {
             return;
         }
 
-
         try {
             await createUser(email, passwordValue);
             // If createUser is successful, then post to the backend
@@ -78,22 +78,16 @@ const Register = () => {
                 return;
             }
         }
-        
-        // Post to the backend
-// @app.post("/users/", response_model=User)
-// async def create_user(user: User, collection=Depends(get_collection('users'))):
-// user_dict = user.dict(by_alias=True)
-// result = await collection.insert_one(user_dict)
-// user_dict["_id"] = result.inserted_id
-// return user_dict
-        const user = {
-            "name": name,
-            "email": email,
-            "username": username,
-            "profile_picture": "https://i.ibb.co/hYbbGyR/6596121-modified.png"
-        }
 
-        axiosSecure.post("/users/", user)
+        const user = {
+            name: name,
+            email: email,
+            username: username,
+            profilepic: "https://i.ibb.co/hYbbGyR/6596121-modified.png",
+        };
+
+        axiosSecure
+            .post("/users/", user)
             .then((response) => {
                 console.log(response);
             })
@@ -101,7 +95,11 @@ const Register = () => {
                 console.error(error);
             });
 
-        await updateUserProfile(user, name, "https://i.ibb.co/hYbbGyR/6596121-modified.png")
+        await updateUserProfile(
+            user,
+            name,
+            "https://i.ibb.co/hYbbGyR/6596121-modified.png"
+        )
             .then(() => {
                 logout();
                 setLoading(false);
@@ -118,13 +116,33 @@ const Register = () => {
     };
 
     const handleGoogleLogin = async () => {
+        console.log("in google login");
         try {
-            await googleLogin().then(() => {
-                if (!loading) {
-                    notifySuccess("Logged in successfully");
-                    navigate(location?.state ? location.state : "/");
-                }
-            });
+            const result = await googleLogin();
+            const user = result.user; // get the user info from the result
+    
+            // Create a user object
+            const newUser = {
+                name: user.displayName,
+                email: user.email,
+                username: user.email.split('@')[0], 
+                profilepic: user.photoURL || "https://i.ibb.co/hYbbGyR/6596121-modified.png",
+            };
+    
+            // Post the user to the backend
+            axiosSecure
+                .post("/users/", newUser)
+                .then((response) => {
+                    setUserInfo(response.data);
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+    
+            if (!loading) {
+                notifySuccess("Logged in successfully");
+                navigate(location?.state ? location.state : "/");
+            }
         } catch (error) {
             notifyError("An error occurred. Please try again later.");
         }

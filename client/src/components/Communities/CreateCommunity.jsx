@@ -1,17 +1,39 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { MdOutlineDoNotDisturbAlt, MdPublic } from "react-icons/md";
 import { PiDetectiveFill } from "react-icons/pi";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
+import { AuthContext } from "../../Auth/AuthProvider";
+import { MessageContext} from "../../pages/Root"
+import { useNavigate } from "react-router-dom";
 
 const CreateCommunity = () => {
-    const [activeButton, setActiveButton] = useState("public");
     const [communityName, setCommunityName] = useState("");
-
-    const handleButtonClick = (type) => {
-        setActiveButton(type);
-    };
+    const [communityTopic, setCommunityTopic] = useState("");
+    const axiosSecure = useAxiosSecure();
+    const { userInfo } = useContext(AuthContext);
+    const {notifySuccess, notifyError} = useContext(MessageContext);
+    const navigate = useNavigate();
 
     const handleSubmit = () => {
-        console.log(communityName, activeButton);
+        const communityDetails = {
+            name: communityName,
+            topic: communityTopic,
+            memberlist: [userInfo._id],
+        };
+
+        if (communityName === "" || communityTopic === "") {
+            notifyError("Please fill all the fields");
+            return;
+        }   
+
+        axiosSecure.post("/communities", communityDetails).then((res) => {
+            console.log(res);
+            notifySuccess("Community created successfully");
+            navigate(`/community/${res.data._id}`);
+        }).catch((err) => {
+            console.log(err);
+            notifyError("Error creating community");
+        });
     };
 
     return (
@@ -29,39 +51,20 @@ const CreateCommunity = () => {
                 required
                 onChange={(e) => setCommunityName(e.target.value)}
             />
-            <div className="flex space-x-4 mt-10 justify-center">
-                <button
-                    className={`px-4 py-2 rounded-lg gap-2 flex justify-center ${
-                        activeButton === "public"
-                            ? "bg-accent text-white"
-                            : "bg-gray-200 text-black"
-                    }`}
-                    onClick={() => handleButtonClick("public")}
-                >
+            <div className="flex gap-4 mt-10 justify-center items-center">
+                <div className="flex items-center gap-4 justify-center">
+                    <p className="font-bold text-xl">Topic: </p>
+                    <input
+                        type="text"
+                        className="w-40 h-12 border border-gray-300 rounded-lg px-4 py-2 mt-2"
+                        placeholder="Development"
+                        onChange={(e) => setCommunityTopic(e.target.value)}
+                        required
+                    />
+                </div>
+                <button className="bg-accent text-white px-4 py-2 rounded-lg gap-2 flex justify-center items-center">
                     <MdPublic className="text-2xl" />
                     Public
-                </button>
-                <button
-                    className={`px-4 py-2 rounded-lg gap-2 flex justify-center ${
-                        activeButton === "restricted"
-                            ? "bg-accent text-white"
-                            : "bg-gray-200 text-black"
-                    }`}
-                    onClick={() => handleButtonClick("restricted")}
-                >
-                    <MdOutlineDoNotDisturbAlt className="text-2xl" />
-                    Restricted
-                </button>
-                <button
-                    className={`px-4 py-2 rounded-lg gap-2 flex justify-center ${
-                        activeButton === "private"
-                            ? "bg-accent text-white"
-                            : "bg-gray-200 text-black"
-                    }`}
-                    onClick={() => handleButtonClick("private")}
-                >
-                    <PiDetectiveFill className="text-2xl" />
-                    Private
                 </button>
             </div>
             <div className="flex justify-center">

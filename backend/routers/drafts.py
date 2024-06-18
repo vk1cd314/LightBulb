@@ -30,7 +30,7 @@ async def get_draft(draftid: str, collection=Depends(get_drafts_collection)):
     else:
         raise exception.NotFound
 
-@router.get("/{uid}", response_model=List[Draft])
+@router.get("/{uid}/drafts", response_model=List[Draft])
 async def get_user_drafts(uid: str, collection=Depends(get_drafts_collection)):
     cursor = collection.find({"uid": uid})
     drafts = await cursor.to_list(length=100)
@@ -44,7 +44,9 @@ async def update_draft(draftid: str, draft_data: Draft, collection=Depends(get_d
     existing_draft = await collection.find_one({"_id": draftid})
     if existing_draft:
         draft_data.updated_at = datetime.utcnow()
-        await collection.update_one({"_id": draftid}, {"$set": draft_data.dict(by_alias=True)})
+        update_data = draft_data.dict(by_alias=True)
+        update_data.pop("_id", None)
+        await collection.update_one({"_id": draftid}, {"$set": update_data})
         updated_draft = await collection.find_one({"_id": draftid})
         return Draft(**updated_draft)
     else:

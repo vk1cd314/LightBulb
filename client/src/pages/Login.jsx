@@ -5,12 +5,15 @@ import { MessageContext } from "./Root";
 import PasswordInput from "../components/FunctionalComponents/PasswordInput";
 import Loader from "../components/FunctionalComponents/Loader";
 import { FcGoogle } from "react-icons/fc";
+import useAxiosSecure from "../hooks/useAxiosSecure";
 
 const Login = () => {
-    const { user, login, googleLogin, loading } = useContext(AuthContext);
+    const { user, login, googleLogin, loading, setUserInfo } =
+        useContext(AuthContext);
     const { notifySuccess, notifyError } = useContext(MessageContext);
     const navigate = useNavigate();
     const location = useLocation();
+    const axiosSecure = useAxiosSecure();
 
     const [password, setPassword] = useState("");
 
@@ -32,7 +35,19 @@ const Login = () => {
         const passwordValue = password;
 
         try {
-            await login(email, passwordValue);
+            login(email, passwordValue).then(() => {
+                axiosSecure
+                    .get("/users/email/?email=" + email)
+                    .then((response) => {
+
+                        setUserInfo(response.data);
+                    })
+                    .catch(() => {
+                        notifyError(
+                            "An error occurred. Please try again later."
+                        );
+                    });
+            });
         } catch (error) {
             if (error.code === "auth/user-not-found") {
                 notifyError("User not found");
@@ -53,13 +68,33 @@ const Login = () => {
     };
 
     const handleGoogleLogin = async () => {
+        console.log("in google login");
         try {
-            await googleLogin().then(() => {
-                if (!loading) {
-                    notifySuccess("Logged in successfully");
-                    navigate(location?.state ? location.state : "/");
-                }
-            });
+            const result = await googleLogin();
+            const user = result.user; // get the user info from the result
+    
+            // Create a user object
+            const newUser = {
+                name: user.displayName,
+                email: user.email,
+                username: user.email.split('@')[0], 
+                profilepic: user.photoURL || "https://i.ibb.co/hYbbGyR/6596121-modified.png",
+            };
+    
+            // Post the user to the backend
+            axiosSecure
+                .post("/users/", newUser)
+                .then((response) => {
+                    setUserInfo(response.data);
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+    
+            if (!loading) {
+                notifySuccess("Logged in successfully");
+                navigate(location?.state ? location.state : "/");
+            }
         } catch (error) {
             notifyError("An error occurred. Please try again later.");
         }
@@ -136,7 +171,7 @@ const Login = () => {
                     onClick={handleGoogleLogin}
                 >
                     <span className="mr-2 inline-block">
-                        <FcGoogle  className="h-6 w-6" />
+                        <FcGoogle className="h-6 w-6" />
                     </span>
                     Sign in with Google
                 </button>

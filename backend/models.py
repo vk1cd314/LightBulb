@@ -9,7 +9,8 @@ class User(BaseModel):
     email: EmailStr
     gender: Optional[str] = None
     username: Optional[str] = None
-    profilepic: Optional[str] = None
+    profilepic: Optional[str] = "https://i.ibb.co/hYbbGyR/6596121-modified.png"
+    about: Optional[str] = None
 
     class Config:
         populate_by_name = True
@@ -27,16 +28,53 @@ class Community(BaseModel):
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
 
+class Like(BaseModel):
+    lid: Optional[str] = Field(default_factory=lambda: str(ObjectId()), alias="_id")
+    uid: str
+    blogid: str
+    created_at: str = Field(default_factory=lambda: datetime.now().strftime("%m/%d/%Y, %H:%M:%S"))
+
+    class Config:
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str, datetime: str}
+
+class Comment(BaseModel):
+    cid: Optional[str] = Field(default_factory=lambda: str(ObjectId()), alias="_id")
+    uid: str
+    blogid: str
+    commid: Optional[str] = None
+    commentcontent: str
+    created_at: str = Field(default_factory=lambda: datetime.now().strftime("%m/%d/%Y, %H:%M:%S"))
+    updated_at: Optional[str] = None
+
+    class Config:
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str, datetime: str}
+
+class Reply(BaseModel):
+    rid: Optional[str] = Field(default_factory=lambda: str(ObjectId()), alias="_id")
+    cid: str
+    uid: str
+    blogid: str
+    commid: Optional[str] = None
+    replycontent: str
+    created_at: str = Field(default_factory=lambda: datetime.now().strftime("%m/%d/%Y, %H:%M:%S"))
+    updated_at: Optional[str] = None
+
+    class Config:
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str, datetime: str}
+
 class Blog(BaseModel):
     blogid: Optional[str] = Field(default_factory=lambda: str(ObjectId()), alias="_id")
     uid: str
     title: str
     commid: Optional[str] = None
     content: str
-    comments: Optional[str] = None
-    likes: Optional[str] = None
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: Optional[datetime] = None
+    comments: list[str] = []
+    likes: list[str] = []
+    created_at: str = Field(default_factory=lambda: datetime.now().strftime("%m/%d/%Y, %H:%M:%S"))
+    updated_at: Optional[str] = None
 
     class Config:
         populate_by_name = True
@@ -49,7 +87,7 @@ class Draft(BaseModel):
     title: Optional[str] = None
     commid: Optional[str] = None
     content: str
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=datetime.now)
     updated_at: Optional[datetime] = None
 
     class Config:
@@ -65,34 +103,18 @@ class Following(BaseModel):
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
 
-class Like(BaseModel):
-    lid: Optional[str] = Field(default_factory=lambda: str(ObjectId()), alias="_id")
-    uid: str
-    blogid: str
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-
-    class Config:
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str, datetime: str}
-
-class Comment(BaseModel):
-    cid: Optional[str] = Field(default_factory=lambda: str(ObjectId()), alias="_id")
-    uid: str
-    blogid: str
-    commid: Optional[str] = None
-    commentcontent: str
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: Optional[datetime] = None
-
-    class Config:
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str, datetime: str}
 
 class BlogDetailsResponse(BaseModel):
     blog: Blog
     user: User
-    comments: List[Comment]
     
     class Config:
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str, datetime: str}
+        
+class TikzModel(BaseModel):
+    tikz_code: str
+
+class ImageModel(BaseModel):
+    id: str
+    base64_image: str

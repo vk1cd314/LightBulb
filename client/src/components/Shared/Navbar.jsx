@@ -5,12 +5,26 @@ import { useContext, useEffect, useState } from "react";
 import { MessageContext } from "../../pages/Root";
 import { IoMdLogOut } from "react-icons/io";
 import { TiThMenu } from "react-icons/ti";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
+import SearchBar from "./SearchBar";
 
 const Navbar = () => {
     const active = "text-accent";
     const inactive = "hover:text-accent";
-    const { user, logout, loading } = useContext(AuthContext);
+    const { user, logout, loading, setUserInfo, userInfo } =
+        useContext(AuthContext);
     const { notifySuccess, notifyError } = useContext(MessageContext);
+    const axiosSecure = useAxiosSecure();
+
+    useEffect(() => {
+        if (!loading) {
+            axiosSecure
+                .get("/users/email/?email=" + user?.email)
+                .then((response) => {
+                    setUserInfo(response.data);
+                });
+        }
+    }, [user]);
 
     const navItems = (
         <>
@@ -32,16 +46,6 @@ const Navbar = () => {
                     }
                 >
                     Blog
-                </NavLink>
-            </li>
-            <li>
-                <NavLink
-                    to="/notifications"
-                    className={({ isActive }) =>
-                        isActive ? `${active}` : `${inactive}`
-                    }
-                >
-                    Notifications
                 </NavLink>
             </li>
             <li>
@@ -75,13 +79,7 @@ const Navbar = () => {
             notifyError("An error occurred. Please try again later.");
         }
     };
-
-    const [search, setSearch] = useState("");
-
-    const handleSearch = () => {
-        // Search functionality
-        console.log(search);
-    };
+    
 
     /**
      * Represents the logged out state of the Navbar component.
@@ -122,7 +120,10 @@ const Navbar = () => {
                 <Link className="profileImage" to="/profile">
                     <img
                         className="size-12 rounded-full"
-                        src={user?.photoURL}
+                        src={
+                            userInfo.profilepic ||
+                            "https://i.ibb.co/hYbbGyR/6596121-modified.png"
+                        }
                         alt=""
                         title="View Profile"
                     />
@@ -222,6 +223,16 @@ const Navbar = () => {
                     My Blogs
                 </NavLink>
             </li>
+            <li>
+                <NavLink
+                    to="/drafts"
+                    className={({ isActive }) =>
+                        isActive ? `${active}` : `${inactive}`
+                    }
+                >
+                    My Drafts
+                </NavLink>
+            </li>
         </>
     );
 
@@ -238,23 +249,17 @@ const Navbar = () => {
     return (
         <>
             <div className="glass fixed w-full top-0 z-50 custom-shadow nav-glass">
-                <nav className="lg:px-5 px-3 py-2 flex justify-between text-sm items-center lg:text-lg font-extrabold">
+                <nav className="lg:px-5 px-3 py-2  flex justify-between text-sm items-center lg:text-lg font-extrabold">
                     <Link to="/" className="flex items-center gap-2 text-4xl">
                         LightBulb
                     </Link>
                     {/* large screen nav items */}
-                    <ul className="hidden font-bold lg:flex gap-4">{navItems}</ul>{" "}
+                    <ul className="hidden font-bold lg:flex gap-4">
+                        {navItems}
+                    </ul>{" "}
                     {/* search bar */}
                     <div className="lg:flex items-center font-medium gap-3">
-                        <input
-                            type="text"
-                            placeholder="Search"
-                            onChange={(e) => setSearch(e.target.value)}
-                            className="rounded-lg border border-primary bg-transparent px-3 py-2 text-sm"
-                        />
-                        <button onClick={handleSearch} className="bg-primary text-white rounded-lg px-3 py-2">
-                        <FaMagnifyingGlass />
-                        </button>
+                        <SearchBar/>
                     </div>
                     {/* small screen nav items */}
                     <div className="flex items-center gap-3 relative">

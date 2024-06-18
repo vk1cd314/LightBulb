@@ -47,7 +47,8 @@ const MenuBar = () => {
     }
 
     return (
-        <div className="flex flex-wrap my-5">
+        <div className="flex flex-wrap my-5 sticky top-20 z-40 bg-white nav-glass w-fit mx-auto rounded-lg p-1 ">
+            <p className="mt-4"></p>
             <button
                 onClick={() => editor.chain().focus().toggleBold().run()}
                 disabled={!editor.can().chain().focus().toggleBold().run()}
@@ -303,6 +304,7 @@ const Tiptap = ({ setContent, content }) => {
                 onUpdate={({ editor }) => {
                     setContent(editor.getHTML()); // Extract text content and call setContent
                 }}
+                defa
             ></EditorProvider>
         </div>
     );
