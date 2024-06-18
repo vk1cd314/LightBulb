@@ -219,6 +219,13 @@ const CreateBlog = () => {
         };
 
         console.log(newDraft);
+        const draftID = location.pathname.split("/")[2];
+        if (location.pathname === `/drafts/${draftID}/edit`) {
+            axiosSecure.delete(`/drafts/${draftID}`).then((response) => {
+                console.log(response.data);
+            });
+        }
+        
 
         // POST request to save draft
         fetch("http://localhost:8000/drafts", {
