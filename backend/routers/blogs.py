@@ -385,6 +385,8 @@ async def get_trending_blogs(user_id: str, collection = Depends(get_blog_collect
 
     blogs = []
     async for blog_dict in cursor:
+        if len(blogs) >= 3:
+            break
         blog = Blog(**blog_dict)
         blogs.append(blog)
     

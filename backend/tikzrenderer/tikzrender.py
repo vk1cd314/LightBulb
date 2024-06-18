@@ -31,7 +31,7 @@ def compile_tikz_to_jpg(tikz_code, output_file):
         # return False
     
     pdf_file = "temp_tikz.pdf"
-    convert_command = ["magick", "-density", "300", pdf_file, output_file]
+    convert_command = ["magick", "-density", "200", pdf_file, output_file]
     try:
         subprocess.check_call(convert_command)
     except subprocess.CalledProcessError as e:
