@@ -88,6 +88,7 @@ const CommentBox = ({ comment, handleDeleteComment }) => {
             .catch((error) => {
                 notifyError("Failed to post reply");
             });
+            setReply("");
     };
 
     const handleDeleteReply = (reply) => {
