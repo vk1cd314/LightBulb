@@ -24,6 +24,7 @@ import BlogPage from "./pages/BlogPage";
 import CommunityPage from "./pages/CommunityPage";
 import PostPage from "./pages/PostPage";
 import UserProfiles from "./pages/UserProfiles";
+import Drafts from "./pages/Drafts";
 
 const router = createBrowserRouter([
     {
@@ -114,6 +115,10 @@ const router = createBrowserRouter([
             {
                 path: "/create-post",
                 element: <PrivateRoute><CreatePost/></PrivateRoute>,
+            },
+            {
+                path: "drafts",
+                element: <Drafts/>,
             }
         ],
     },

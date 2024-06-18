@@ -6,6 +6,7 @@ import { useLocation } from "react-router-dom";
 import { AuthContext } from "../../Auth/AuthProvider";
 import { useNavigate } from "react-router-dom/dist";
 import { MessageContext } from "../../pages/Root";
+import { data } from "autoprefixer";
 
 const CreateBlog = () => {
     const [content, setContent] = useState("");
@@ -155,6 +156,39 @@ const CreateBlog = () => {
         }
     };
 
+    const handleDraft = () => {
+
+        if (preview === "") {
+            notifyError("Content cannot be empty. Please preview your blog first.");
+            return;
+        }
+
+        const newDraft = {
+            title: title,
+            content: preview,
+            uid: userInfo._id,
+        };
+
+        console.log(newDraft);
+
+        // POST request to save draft
+        axiosSecure
+            .post("/drafts/",{ 
+                json: newDraft,
+                headers: { "Content-Type": "application/json" },
+            })
+            .then((response) => {
+                console.log(response.data);
+                notifySuccess("Draft saved successfully");
+            })
+            .catch((error) => {
+                console.error(error);
+                notifyError("Failed to save draft");
+            });
+    }
+
+        
+
     return (
         <div className="min-h-dvh mt-32 max-w-5xl mx-auto">
             <div className="flex gap-10 items-center">
@@ -169,6 +203,13 @@ const CreateBlog = () => {
             </div>
             <Tiptap setContent={setContent} content={content} />
             <div className="mt-10 text-end">
+
+                <button
+                    className="px-3 py-2 bg-primary text-white font-bold w-fit rounded-full mr-5"
+                    onClick={handleDraft}
+                >
+                    Save As Draft
+                </button>
                 <button
                     className="px-3 py-2 bg-accent text-white font-bold w-fit rounded-full mr-5"
                     onClick={handlePreview}
