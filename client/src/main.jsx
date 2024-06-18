@@ -46,7 +46,9 @@ const router = createBrowserRouter([
             },
             {
                 path: "/blogs",
-                element: <Blogs></Blogs>,
+                element: <PrivateRoute>
+                    <Blogs></Blogs>
+                </PrivateRoute>,
                 children: [
                     {
                         path: "/blogs/explore",
@@ -60,37 +62,45 @@ const router = createBrowserRouter([
             },
             {
                 path: "/blog/create",
-                element: <CreateBlog></CreateBlog>,
+                element: <PrivateRoute>
+                    <CreateBlog></CreateBlog>
+                </PrivateRoute>,
             },
             {
                 path: "/b/:id",
-                element: <BlogPage></BlogPage>,
+                element: <PrivateRoute>
+                    <BlogPage></BlogPage>
+                </PrivateRoute>,
             },
             {
                 path: "/communities",
-                element: <Communities />,
+                element: <PrivateRoute>
+                    <Communities />
+                </PrivateRoute>,
                 children: [
                     {
                         path: "/communities/explore",
-                        element: <ExploreCommunities />,
+                        element: <PrivateRoute>
+                            <ExploreCommunities />
+                        </PrivateRoute>,
                     },
                     {
                         path: "/communities/my-communities",
-                        element: <MyCommunities/>,
+                        element: <PrivateRoute><MyCommunities/></PrivateRoute>,
                     },
                 ],
             },
             {
                 path: "/community/:id/create",
-                element: <CreateBlog />,
+                element: <PrivateRoute>
+                    <CreateBlog />
+                </PrivateRoute>,
             },
             {
                 path: "/community/:id",
-                element: <CommunityPage />,
-            },
-            {
-                path: "/post/postPage",
-                element: <PostPage />,
+                element: <PrivateRoute>
+                    <CommunityPage />
+                </PrivateRoute>,
             },
             {
                 path: "/settings",
@@ -106,7 +116,9 @@ const router = createBrowserRouter([
             },
             {
                 path: "/profile/:id",
-                element: <UserProfiles />,
+                element: <PrivateRoute>
+                    <UserProfiles />
+                </PrivateRoute>,
             },
             {
                 path: "/create-community",
@@ -118,11 +130,11 @@ const router = createBrowserRouter([
             },
             {
                 path: "drafts",
-                element: <Drafts/>,
+                element: <PrivateRoute><Drafts/></PrivateRoute>,
             },
             {
                 path: "drafts/:id/edit",
-                element: <CreateBlog/>,
+                element: <PrivateRoute><CreateBlog/></PrivateRoute>,
             }
         ],
     },
