@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Path, Query
 from typing import List
 from bson import ObjectId
-from models import User, Following
+from models import User, Following, Blog, Community
 from database import get_collection
 from pymongo.collection import Collection
 import logging
@@ -20,6 +20,9 @@ def get_blog_collection() -> Collection:
     return get_collection('blogs')
 
 def get_community_collection() -> Collection:
+    return get_collection('communities')
+
+def get_communities_collection() -> Collection:
     return get_collection('communities')
 
 @router.post("/", response_model=User)
@@ -131,42 +134,39 @@ async def follow(following: Following, user_collection=Depends(get_users_collect
         result = await following_collection.insert_one(following.dict())
         return following
 
-@router.get("/{uid}/userdata")
-async def get_user_data(uid: str, user_collection=Depends(get_users_collection), following_collection=Depends(get_following_collection)):
-    user = await user_collection.find_one({"_id": uid})
-    if user is None:
+@router.get("/{user_id}/userdata")
+async def get_user_data(
+    user_id: str,
+    user_collection: Collection = Depends(get_users_collection),
+    blog_collection: Collection = Depends(get_blog_collection),
+    following_collection: Collection = Depends(get_following_collection),
+    community_collection: Collection = Depends(get_community_collection)
+):
+    user_data = await user_collection.find_one({"_id": user_id})
+    if not user_data:
         raise exception.UserNotFound
+    user = User(**user_data)
+    
+    blogs_data = await blog_collection.find({"uid": user_id}).to_list(None)
+    blogs = [Blog(**blog) for blog in blogs_data]
+    
+    following_data = await following_collection.find({"uid1": user_id}).to_list(None)
+    following = [follow['uid2'] for follow in following_data]
+    
+    followers_data = await following_collection.find({"uid2": user_id}).to_list(None)
+    followers = [follower['uid1'] for follower in followers_data]
+    
+    communities_data = await community_collection.find({"memberlist": user_id}).to_list(None)
+    communities = [Community(**comm) for comm in communities_data]
 
-    communities = await user_collection.aggregate([
-        {"$match": {"_id": uid}},
-        {"$lookup": {
-            "from": "communities",
-            "localField": "communities",
-            "foreignField": "_id",
-            "as": "communities"
-        }}
-    ]).to_list(length=None)
-
-    blogs = await user_collection.aggregate([
-        {"$match": {"_id": uid}},
-        {"$lookup": {
-            "from": "blogs",
-            "localField": "blogs",
-            "foreignField": "blogid",
-            "as": "blogs"
-        }}
-    ]).to_list(length=None)
-
-    following = await following_collection.find({"uid1": uid}).to_list(length=None)
-    followers = await following_collection.find({"uid2": uid}).to_list(length=None)
-
-    return {
-        "user": User(**user),
-        "communities": communities[0].get("communities", []),
-        "blogs": blogs[0].get("blogs", []),
-        "following": [following["uid2"] for following in following],
-        "followers": [follower["uid1"] for follower in followers]
+    response = {
+        "user": user.dict(by_alias=True),
+        "communities": [comm.dict(by_alias=True) for comm in communities],
+        "blogs": [blog.dict(by_alias=True) for blog in blogs],
+        "following": following,
+        "followers": followers
     }
+    return response
 
 @router.post("/followingtype")
 async def get_following_type(following: Following, following_collection=Depends(get_following_collection)):
