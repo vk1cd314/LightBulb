@@ -28,7 +28,7 @@ const PopularBlogsCard = ({ blog }) => {
                 <p
                     className="text-start"
                     dangerouslySetInnerHTML={{
-                        __html: `${blog.blog.content}`
+                        __html: `${blog.blog.content}<strong>...<strong/>`
                     }}
                 ></p>
             </Link>
