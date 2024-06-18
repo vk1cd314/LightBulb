@@ -20,13 +20,16 @@ async def create_community(community: Community, collection=Depends(get_communit
     return community_dict
 
 
-@router.get("/{community_id}", response_model=Community)
-async def read_community(community_id: str, collection=Depends(get_communities_collection)):
+@router.get("/{community_id}")
+async def read_community(community_id: str, collection=Depends(get_communities_collection), user_collection=Depends(get_user_collection)):
     community = await collection.find_one({"_id": community_id})
     if community is None:
         raise exception.CommunityNotFound
-    return community
-
+    user_list = []
+    for member in community["memberlist"]:
+        user = await user_collection.find_one({"_id": member})
+        user_list.append(user)
+    return {"community": community, "users": user_list}
 
 @router.put("/{community_id}", response_model=Community)
 async def update_community(community_id: str, community: Community, collection=Depends(get_communities_collection)):
