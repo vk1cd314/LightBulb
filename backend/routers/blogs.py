@@ -324,19 +324,6 @@ async def get_replies(blog_id: str, comment_id: str, collection=Depends(get_repl
         replies.append(reply)
     return replies
 
-@router.delete("/{blog_id}/{comment_id}/reply", response_model=Reply)
-async def delete_reply(blog_id: str, comment_id: str, reply: Reply,
-                        blog_collection=Depends(get_blog_collection),
-                        reply_collection=Depends(get_reply_collection)):
-    if reply is None or blog_id != reply.blogid or comment_id != reply.cid:
-        raise exception.BadRequest
-    
-    to_remove = await reply_collection.find_one({"_id": reply.rid, "uid": reply.uid})
-    if to_remove is None:
-        raise exception.NotFound
-    
-    await reply_collection.delete_one({"_id": reply.rid})
-    return reply.dict(by_alias=True)
 
 @router.get("/{blog_id}/likes",response_model=list[Like])
 async def get_blog_likes(blog_id: str, collection=Depends(get_like_collection)):
@@ -360,6 +347,28 @@ async def search_blogs(search_query: str, collection=Depends(get_blog_collection
     async for blog in collection.find({"title": regex}):
         blogs.append(blog)
     return blogs
+
+@router.get("/{comment_id}/replies")
+async def get_replies(comment_id: str, reply_collection=Depends(get_reply_collection),
+                      user_collection=Depends(get_user_collection)):
+    replies = await reply_collection.find({"cid": comment_id}).to_list(None)
+    for reply in replies:
+        user_info = await user_collection.find_one({"_id": reply["uid"]})
+        reply["user_info"] = user_info
+
+    return replies
+
+@router.delete("/{reply_id}/reply")
+async def delete_reply(reply_id: str,
+                        blog_collection=Depends(get_blog_collection),
+                        reply_collection=Depends(get_reply_collection)):
+    
+    to_remove = await reply_collection.find_one({"_id": reply_id})
+    if to_remove is None:
+        raise exception.NotFound
+    
+    await reply_collection.delete_one({"_id": reply_id})
+    return to_remove
 
 @router.get("/{user_id}/trending")
 async def get_trending_blogs(user_id: str, 

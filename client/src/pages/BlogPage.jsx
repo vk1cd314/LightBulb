@@ -77,6 +77,10 @@ const BlogPage = () => {
     const [comment, setComment] = useState("");
 
     const handleComment = () => {
+        if (comment === "") {
+            notifyError("Comment cannot be empty");
+            return;
+        }
         const commentData = {
             commentcontent: comment,
             uid: userInfo._id,

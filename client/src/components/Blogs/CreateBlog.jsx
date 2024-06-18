@@ -101,6 +101,16 @@ const CreateBlog = () => {
     const handlePublish = () => {
         handlePreview();
 
+        if (title === "") {
+            notifyError("Title cannot be empty");
+            return;
+        }
+
+        if (preview === "") {
+            notifyError("Content cannot be empty. Please preview your blog first.");
+            return;
+        }
+
         if (location.pathname === "/blog/create") {
             const newBlog = {
                 title: title,
