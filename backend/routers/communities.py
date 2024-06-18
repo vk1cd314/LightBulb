@@ -118,3 +118,20 @@ async def get_recommended_communities(topic: str, collection = Depends(get_commu
         communities.append(community)
     
     return communities
+
+@router.get("/community/{user_id}")
+async def get_user_communities(user_id: str, collection = Depends(get_communities_collection)):
+    communities = []
+    async for community in collection.find({"memberlist": user_id}):
+        print(community)
+        communities.append(community)
+    return communities
+
+@router.get("/ownedcommunities/{user_id}")
+async def get_user_owned_communities(user_id: str, collection = Depends(get_communities_collection)):
+    communities = []
+    async for community in collection.find({"memberlist": user_id}):
+        idx = community["memberlist"].index(user_id)
+        if idx == 0:
+            communities.append(community)
+    return communities
