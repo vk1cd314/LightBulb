@@ -71,9 +71,9 @@ const Profile = () => {
                         </div>
                         {/* buttons for drafts and my communities */}
                         <div className="my-5">
-                            <button className="bg-primary text-white px-5 py-2 rounded-lg hover:bg-accent">
+                            <Link to={"/drafts"} className="bg-primary text-white px-5 py-2 rounded-lg hover:bg-accent">
                                 My Drafts
-                            </button>
+                            </Link >
                             <Link
                                 to="/communities/my-communities"
                                 className="bg-primary text-white px-5 py-2 rounded-lg ml-5 hover:bg-accent"

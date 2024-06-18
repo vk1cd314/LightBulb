@@ -1,12 +1,13 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Tiptap from "../TipTap/TipTap";
 import katex from "katex";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
-import { useLocation } from "react-router-dom";
+import { useFetcher, useLocation } from "react-router-dom";
 import { AuthContext } from "../../Auth/AuthProvider";
 import { useNavigate } from "react-router-dom/dist";
 import { MessageContext } from "../../pages/Root";
 import { data } from "autoprefixer";
+import Loader from "../FunctionalComponents/Loader";
 
 const CreateBlog = () => {
     const [content, setContent] = useState("");
@@ -14,12 +15,34 @@ const CreateBlog = () => {
     const [preview, setPreview] = useState(""); // State to hold rendered HTML preview
     const { userInfo } = useContext(AuthContext);
     const { notifySuccess, notifyError } = useContext(MessageContext);
+    const [loading, setLoading] = useState(false);
 
     const location = useLocation();
     const navigate = useNavigate();
 
-    // Custom Axios instance for secure requests
     const axiosSecure = useAxiosSecure();
+
+    useEffect(() => {
+        setLoading(true);
+        const draftID = location.pathname.split("/")[2]; 
+        if (location.pathname === `/drafts/${draftID}/edit`) {
+            
+            axiosSecure.get(`/drafts/${draftID}`).then((response) => {
+                console.log(response.data);
+                setTitle(response.data.title);
+                setContent(response.data.content);
+            }).finally(() => {
+                setLoading(false);
+            });
+        }
+        else {
+            setLoading(false);  
+        }
+    }, []);
+
+    if (loading) {
+        return <Loader />;
+    }
 
     // Function to render LaTeX expressions to HTML using KaTeX
     const renderLatex = (latex) => {
@@ -154,6 +177,32 @@ const CreateBlog = () => {
                     notifyError("Failed to publish blog");
                 });
         }
+
+        const draftID = location.pathname.split("/")[2];
+        if (location.pathname === `/drafts/${draftID}/edit`) {
+            const newBlog = {
+                title: title,
+                content: preview,
+                uid: userInfo._id,
+                created_at: new Date().toLocaleString(),
+            };
+
+            axiosSecure
+                .post("/blogs", newBlog)
+                .then((response) => {
+                    console.log(response.data);
+                    navigate(`/b/${response.data._id}`);
+                    notifySuccess("Blog published successfully");
+                })
+                .catch((error) => {
+                    console.error(error);
+                    notifyError("Failed to publish blog");
+                });
+
+            axiosSecure.delete(`/drafts/${draftID}`).then((response) => {
+                console.log(response.data);
+            });
+        }
     };
 
     const handleDraft = () => {
@@ -172,14 +221,18 @@ const CreateBlog = () => {
         console.log(newDraft);
 
         // POST request to save draft
-        axiosSecure
-            .post("/drafts/",{ 
-                json: newDraft,
-                headers: { "Content-Type": "application/json" },
-            })
-            .then((response) => {
-                console.log(response.data);
+        fetch("http://localhost:8000/drafts", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(newDraft),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data);
                 notifySuccess("Draft saved successfully");
+                navigate(`/drafts/`);
             })
             .catch((error) => {
                 console.error(error);

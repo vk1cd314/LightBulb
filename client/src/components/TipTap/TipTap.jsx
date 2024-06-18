@@ -304,6 +304,7 @@ const Tiptap = ({ setContent, content }) => {
                 onUpdate={({ editor }) => {
                     setContent(editor.getHTML()); // Extract text content and call setContent
                 }}
+                defa
             ></EditorProvider>
         </div>
     );

@@ -223,6 +223,16 @@ const Navbar = () => {
                     My Blogs
                 </NavLink>
             </li>
+            <li>
+                <NavLink
+                    to="/drafts"
+                    className={({ isActive }) =>
+                        isActive ? `${active}` : `${inactive}`
+                    }
+                >
+                    My Drafts
+                </NavLink>
+            </li>
         </>
     );
 

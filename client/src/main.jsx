@@ -119,6 +119,10 @@ const router = createBrowserRouter([
             {
                 path: "drafts",
                 element: <Drafts/>,
+            },
+            {
+                path: "drafts/:id/edit",
+                element: <CreateBlog/>,
             }
         ],
     },
