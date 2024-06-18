@@ -361,8 +361,9 @@ async def search_blogs(search_query: str, collection=Depends(get_blog_collection
         blogs.append(blog)
     return blogs
 
-@router.get("/{user_id}/trending",response_model=list[Blog])
-async def get_trending_blogs(user_id: str, collection = Depends(get_blog_collection)) :
+@router.get("/{user_id}/trending")
+async def get_trending_blogs(user_id: str, 
+                             collection = Depends(get_blog_collection), user_collection=Depends(get_user_collection)):
     pipeline = [
         {
             '$project': {
@@ -377,20 +378,23 @@ async def get_trending_blogs(user_id: str, collection = Depends(get_blog_collect
                 'score': {'$add': [{'$multiply': [{'$size': '$likes'}, 3]}, {'$multiply': [{'$size': '$comments'}, 2]}]}
             }
         },
-        {'$sort': {'score': -1}}  # Sort by the computed score in descending order
+        {'$sort': {'score': -1}}  
     ]
 
-    # Execute the aggregation pipeline
     cursor = collection.aggregate(pipeline)
 
-    blogs = []
+    res = []
     async for blog_dict in cursor:
-        if len(blogs) >= 3:
+        if len(res) >= 3:
             break
+        blog_dict["content"] = blog_dict["content"][:80]
         blog = Blog(**blog_dict)
-        blogs.append(blog)
-    
-    return blogs
+        minires = {
+            "blog": blog,
+            "user": await user_collection.find_one({"_id": blog_dict["uid"]})
+        }
+        res.append(minires)
+    return res
 
 @router.get("/{blog_id}/details")
 async def get_blog_details(blog_id: str, blog_collection=Depends(get_blog_collection),

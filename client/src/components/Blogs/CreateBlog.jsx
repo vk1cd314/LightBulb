@@ -14,6 +14,9 @@ const CreateBlog = () => {
     const { userInfo } = useContext(AuthContext);
     const { notifySuccess, notifyError } = useContext(MessageContext);
 
+    const location = useLocation();
+    const navigate = useNavigate();
+
     // Custom Axios instance for secure requests
     const axiosSecure = useAxiosSecure();
 
@@ -39,17 +42,18 @@ const CreateBlog = () => {
         return html;
     };
 
-    const handlePreview = (callback) => {
-        const tikzPictureRegex = /\\begin{tikzpicture}[\s\S]*?\\end{tikzpicture}/g;
+    const handlePreview = () => {
+        const tikzPictureRegex =
+            /\\begin{tikzpicture}[\s\S]*?\\end{tikzpicture}/g;
         const tikzPictures = content.match(tikzPictureRegex);
         console.log(tikzPictures);
-    
+
         let updatedContent = content;
         const base64Images = new Array(tikzPictures ? tikzPictures.length : 0);
-    
+
         if (tikzPictures && tikzPictures.length > 0) {
             let processedCount = 0;
-    
+
             tikzPictures.forEach((tikzPicture, index) => {
                 axiosSecure
                     .post("/blogs/generate", {
@@ -59,66 +63,64 @@ const CreateBlog = () => {
                         const base64Image = response.data.base64_image;
                         base64Images[index] = base64Image;
                         processedCount++;
-    
+
                         if (processedCount === tikzPictures.length) {
                             base64Images.forEach((image, i) => {
                                 updatedContent = updatedContent.replace(
                                     `<pre><code>${tikzPictures[i]}</code></pre>`,
-                                    `<img src="data:image/png;base64,${image}" />`
+                                    `<div style="display: flex; justify-content: center;"><img src="data:image/png;base64,${image}" /></div>`
                                 );
                             });
-    
+
                             setPreview(renderLatex(updatedContent));
-                            callback();
                         }
                     })
                     .catch((error) => {
                         console.error("Error fetching image:", error);
                         processedCount++;
-    
+
                         if (processedCount === tikzPictures.length) {
                             base64Images.forEach((image, i) => {
                                 updatedContent = updatedContent.replace(
                                     `<pre><code>${tikzPictures[i]}</code></pre>`,
-                                    `<img src="data:image/png;base64,${image || ''}" />`
+                                    `<div style="display: flex; justify-content: center;"><img src="data:image/png;base64,${
+                                        image || ""
+                                    }" /></div>`
                                 );
                             });
-    
+
                             setPreview(renderLatex(updatedContent));
-                            callback();
                         }
                     });
             });
         } else {
             setPreview(renderLatex(content));
-            callback();
         }
     };
-    
-
-    const location = useLocation();
-    const navigate = useNavigate();
 
     const handlePublish = () => {
-        handlePreview(() => {
-            if (location.pathname === "/blog/create"){
-                const newBlog = {
-                    title: title,
-                    content: preview,
-                    uid: userInfo._id,
-                    created_at: new Date().toLocaleString(),
-                };
-    
-                axiosSecure.post("/blogs", newBlog).then((response) => {
+        handlePreview();
+
+        if (location.pathname === "/blog/create") {
+            const newBlog = {
+                title: title,
+                content: preview,
+                uid: userInfo._id,
+                created_at: new Date().toLocaleString(),
+            };
+
+            axiosSecure
+                .post("/blogs", newBlog)
+                .then((response) => {
                     console.log(response.data);
                     navigate(`/b/${response.data._id}`);
                     notifySuccess("Blog published successfully");
-                }).catch((error) => {
+                })
+                .catch((error) => {
                     console.error(error);
                     notifyError("Failed to publish blog");
                 });
-            }
-        });
+        }
     };
 
     return (

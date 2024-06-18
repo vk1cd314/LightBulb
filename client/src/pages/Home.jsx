@@ -1,7 +1,18 @@
 import { Link } from "react-router-dom";
 import PopularBlogsCard from "../components/Blogs/PopularBlogsCard";
+import { useEffect, useState } from "react";
+import useAxiosSecure from './../hooks/useAxiosSecure';
 
 const Home = () => {
+    const [popularBlogs, setPopularBlogs] = useState([]);
+    const axiosSecure = useAxiosSecure();
+
+    useEffect(() => {
+        // fetch the top 3 blogs from the API
+       
+    }, []);
+
+
     return (
         <div className="mt-20">
             {/* banner */}
