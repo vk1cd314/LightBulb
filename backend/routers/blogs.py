@@ -383,6 +383,7 @@ async def get_trending_blogs(user_id: str,
 
     cursor = collection.aggregate(pipeline)
 
+    
     res = []
     async for blog_dict in cursor:
         if len(res) >= 3:
