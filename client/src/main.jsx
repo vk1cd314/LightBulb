@@ -80,6 +80,10 @@ const router = createBrowserRouter([
                 ],
             },
             {
+                path: "/community/:id/create",
+                element: <CreateBlog />,
+            },
+            {
                 path: "/community/:id",
                 element: <CommunityPage />,
             },

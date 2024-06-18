@@ -121,6 +121,28 @@ const CreateBlog = () => {
                     notifyError("Failed to publish blog");
                 });
         }
+
+        const communityID = location.pathname.split("/")[2];
+        if (location.pathname === `/community/${communityID}/create`) {
+            const newBlog = {
+                title: title,
+                content: preview,
+                uid: userInfo._id,
+                commid: communityID,
+                created_at: new Date().toLocaleString(),
+            };
+
+            axiosSecure.post("/blogs", newBlog)
+                .then((response) => {
+                    console.log(response.data);
+                    navigate(`/b/${response.data._id}`);
+                    notifySuccess("Blog published successfully");
+                })
+                .catch((error) => {
+                    console.error(error);
+                    notifyError("Failed to publish blog");
+                });
+        }
     };
 
     return (
