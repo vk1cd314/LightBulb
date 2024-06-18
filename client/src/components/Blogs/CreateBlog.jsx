@@ -16,6 +16,7 @@ const CreateBlog = () => {
     const { userInfo } = useContext(AuthContext);
     const { notifySuccess, notifyError } = useContext(MessageContext);
     const [loading, setLoading] = useState(false);
+    const [darftCommID, setDraftCommID] = useState("");
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -24,19 +25,21 @@ const CreateBlog = () => {
 
     useEffect(() => {
         setLoading(true);
-        const draftID = location.pathname.split("/")[2]; 
+        const draftID = location.pathname.split("/")[2];
         if (location.pathname === `/drafts/${draftID}/edit`) {
-            
-            axiosSecure.get(`/drafts/${draftID}`).then((response) => {
-                console.log(response.data);
-                setTitle(response.data.title);
-                setContent(response.data.content);
-            }).finally(() => {
-                setLoading(false);
-            });
-        }
-        else {
-            setLoading(false);  
+            axiosSecure
+                .get(`/drafts/${draftID}`)
+                .then((response) => {
+                    console.log(response.data);
+                    setTitle(response.data.title);
+                    setContent(response.data.content);
+                    setDraftCommID(response.data.commid);
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
+        } else {
+            setLoading(false);
         }
     }, []);
 
@@ -131,7 +134,9 @@ const CreateBlog = () => {
         }
 
         if (preview === "") {
-            notifyError("Content cannot be empty. Please preview your blog first.");
+            notifyError(
+                "Content cannot be empty. Please preview your blog first."
+            );
             return;
         }
 
@@ -166,7 +171,8 @@ const CreateBlog = () => {
                 created_at: new Date().toLocaleString(),
             };
 
-            axiosSecure.post("/blogs", newBlog)
+            axiosSecure
+                .post("/blogs", newBlog)
                 .then((response) => {
                     console.log(response.data);
                     navigate(`/b/${response.data._id}`);
@@ -184,6 +190,7 @@ const CreateBlog = () => {
                 title: title,
                 content: preview,
                 uid: userInfo._id,
+                commid: darftCommID,
                 created_at: new Date().toLocaleString(),
             };
 
@@ -206,16 +213,22 @@ const CreateBlog = () => {
     };
 
     const handleDraft = () => {
-
         if (preview === "") {
-            notifyError("Content cannot be empty. Please preview your blog first.");
+            notifyError(
+                "Content cannot be empty. Please preview your blog first."
+            );
             return;
+        }
+        let commid = null;
+        if (location.pathname.split("/")[1] === "community") {
+            commid = location.pathname.split("/")[2];
         }
 
         const newDraft = {
             title: title,
             content: preview,
             uid: userInfo._id,
+            commid: commid,
         };
 
         console.log(newDraft);
@@ -225,7 +238,6 @@ const CreateBlog = () => {
                 console.log(response.data);
             });
         }
-        
 
         // POST request to save draft
         fetch("http://localhost:8000/drafts", {
@@ -245,9 +257,7 @@ const CreateBlog = () => {
                 console.error(error);
                 notifyError("Failed to save draft");
             });
-    }
-
-        
+    };
 
     return (
         <div className="min-h-dvh mt-32 max-w-5xl mx-auto">
@@ -263,7 +273,6 @@ const CreateBlog = () => {
             </div>
             <Tiptap setContent={setContent} content={content} />
             <div className="mt-10 text-end">
-
                 <button
                     className="px-3 py-2 bg-primary text-white font-bold w-fit rounded-full mr-5"
                     onClick={handleDraft}
