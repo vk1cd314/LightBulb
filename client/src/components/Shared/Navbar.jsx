@@ -21,7 +21,6 @@ const Navbar = () => {
             axiosSecure
                 .get("/users/email/?email=" + user?.email)
                 .then((response) => {
-                    console.log(response.data);
                     setUserInfo(response.data);
                 });
         }

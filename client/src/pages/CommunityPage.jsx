@@ -4,7 +4,8 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../Auth/AuthProvider";
 import { MessageContext } from "../pages/Root";
 import HeaderCard from "../components/Shared/HeaderCard";
-import Loader from './../components/FunctionalComponents/Loader';
+import Loader from "./../components/FunctionalComponents/Loader";
+
 const CommunityPage = () => {
     const [community, setCommunity] = useState([]);
     const axiosSecure = useAxiosSecure();
@@ -21,15 +22,14 @@ const CommunityPage = () => {
             .get(`/communities/${communityId}`)
             .then((res) => {
                 setCommunity(res.data);
-                console.log(res.data);
                 setAdminID(res.data.users[0]._id);
-                console.log(res.data.blogs);
             })
             .catch((err) => {
                 console.log(err);
-            }).finally(() => {
+            })
+            .finally(() => {
                 setLoading(false);
-            }   );
+            });
     }, []);
 
     const handleLeave = () => {
@@ -48,9 +48,7 @@ const CommunityPage = () => {
     };
 
     if (loading) {
-        return (
-            <Loader />
-        );
+        return <Loader />;
     }
 
     return (
@@ -63,40 +61,44 @@ const CommunityPage = () => {
                     {community?.community?.topic}
                 </p>
                 {/* create blog button */}
-                <div className="flex items-center gap-2 justify-end">
-                    <Link
-                        to={`/community/${communityId}/create`}
-                        className="bg-primary hover:bg-accent text-white px-4 py-2 rounded-lg hover:cursor-pointer"
-                    >
-                        Create Blog
-                    </Link>
-                    {/* leave community */}
-                    <button
-                        className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg hover:cursor-pointer"
-                        onClick={handleLeave}
-                    >
-                        Leave Community
-                    </button>
-                </div>
+                {community?.community?.memberlist.includes(userInfo._id) && (
+                    <div className="flex items-center gap-2 justify-end">
+                        <Link
+                            to={`/community/${communityId}/create`}
+                            className="bg-primary hover:bg-accent text-white px-4 py-2 rounded-lg hover:cursor-pointer"
+                        >
+                            Create Blog
+                        </Link>
+                        {/* leave community */}
+
+                        <button
+                            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg hover:cursor-pointer"
+                            onClick={handleLeave}
+                        >
+                            Leave Community
+                        </button>
+                    </div>
+                )}
                 <div className="grid grid-cols-2 gap-5 mt-10">
-                    {community?.blogs && 
-                    community?.blogs.map((blog) => {
-                        return (
-                            <HeaderCard
-                                key={blog.blog._id}
-                                title={blog.blog.title}
-                                author={blog.user.name}
-                                authorid={blog.user._id}
-                                date={
-                                    blog.blog.updated_at || blog.blog.created_at
-                                }
-                                blogid={blog.blog._id}
-                                likes={blog.blog.likes}
-                                comments={blog.blog.comments}
-                                authorProfilePic={blog.user.profilepic}
-                            />
-                        );
-                    })}
+                    {community?.blogs &&
+                        community?.blogs.map((blog) => {
+                            return (
+                                <HeaderCard
+                                    key={blog.blog._id}
+                                    title={blog.blog.title}
+                                    author={blog.user.name}
+                                    authorid={blog.user._id}
+                                    date={
+                                        blog.blog.updated_at ||
+                                        blog.blog.created_at
+                                    }
+                                    blogid={blog.blog._id}
+                                    likes={blog.blog.likes}
+                                    comments={blog.blog.comments}
+                                    authorProfilePic={blog.user.profilepic}
+                                />
+                            );
+                        })}
                 </div>
             </div>
             <div className="w-60 max-h-[calc(100dvh-200px)] border-2 p-2 border-gray-500 rounded-bl-2xl rounded-tl-2xl overflow-y-auto">
