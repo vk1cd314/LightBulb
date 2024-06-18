@@ -1,84 +1,40 @@
-\begin{tikzpicture}
-    \begin{axis}[
-        xmin = -6, xmax = 6,
-        ymin = 0, ymax = 1,
-        width = \textwidth,
-        height = 0.5\textwidth,
-        xtick distance = 1,
-        ytick distance = 1,
-        grid = both,
-        minor tick num = 1,
-        major grid style = {lightgray},
-        minor grid style = {lightgray!25},
-        xlabel = {Input ($z$)},
-        ylabel = {Output ($g(z)$)},
-        legend cell align = {left},
-        legend pos = north west,
-        ytick={0,.5,1},
-        axis y line=middle
-    ]
-     
-    % % Plot data
-    % \addplot[
-    %     teal, 
-    %     only marks
-    % ] table[x = t, y = x] {result.dat};
-     
-    % % Linear regression
-    % \addplot[
-    %     thick,
-    %     orange
-    % ] table[
-    %     x = t,
-    %     y = {create col/linear regression={y=x}}
-    % ] {result.dat};
-            \addplot%
-            [
-                blue,%
-                mark=none,
-                samples=100,
-                domain=-10:10,
-            ]
-            (x,{1/(1+exp(-x))});      
-     
-    % Add legend
-    \addlegendentry{Sigmoid Function $\frac{1}{1 + e^{-x}}$}
-     
-    \end{axis}
-    \end{tikzpicture}
-    
-    What is this?
-    
-    
-    \begin{tikzpicture}
-        \begin{axis}[
-            width = 0.75\textwidth,
-            height = 0.75\textwidth,
-            grid = both,
-            minor tick num = 1,
-            major grid style = {lightgray},
-            minor grid style = {lightgray!25},
-            xlabel = {$w$},
-            ylabel = {$b$},
-            zlabel = {$J(w,b)$},
-            legend cell align = {left},
-            legend pos = north west,
-            axis line style = {thick},
-            % colormap/viridis
-        ]
-        
-        \addplot3 [
-            domain=-5:2,
-            domain y = -3:1,
-            samples = 20,
-            samples y = 30,
-            surf,
-            shader=faceted interp] {x^2 + y^2};
-         
-        % Add legend
-        \addlegendentry{Cost Function $J(w, b)$}
-         
-        \end{axis}
-        \end{tikzpicture}
-    
-    
+\begin{tikzpicture}[
+    scale=2,
+    important line/.style={thick}, dashed line/.style={dashed, thin},
+    every node/.style={color=black},
+]
+ \tikzset{
+leftNode/.style={circle,minimum width=.5ex, fill=none,draw},
+rightNode/.style={circle,minimum width=.5ex, fill=black,thick,draw},
+rightNodeInLine/.style={solid,circle,minimum width=.7ex, fill=black,thick,draw=white},
+leftNodeInLine/.style={solid,circle,minimum width=.7ex, fill=none,thick,draw},
+}
+\draw[dashed line, yshift=.7cm]
+   (.2,.2) coordinate (sls) -- (2.5,2.5) coordinate (sle)
+   node[solid,circle,minimum width=2.8ex,fill=none,thick,draw] (name) at (2,2){}
+   node[leftNodeInLine] (name) at (2,2){}
+   node[solid,circle,minimum width=2.8ex,fill=none,thick,draw] (name) at (1.5,1.5){}
+   node[leftNodeInLine] (name) at (1.5,1.5){}
+   node [above right] {$w\cdot x + b > 1$};
+
+\draw[important line]
+   (.7,.7) coordinate (lines) -- (3,3) coordinate (linee)
+   node [above right] {$w\cdot x + b = 0$};
+
+\draw[dashed line, xshift=.7cm]
+   (.2,.2) coordinate (ils) -- (2.5,2.5) coordinate (ile)
+   node[solid,circle,minimum width=2.8ex,fill=none,thick,draw] (name) at (1.8,1.8){}
+   node[rightNodeInLine] (name) at (1.8,1.8){}
+   node [above right] {$w\cdot x + b < -1$};
+
+\draw[very thick,<->] ($(sls)+(.2,.2)$) -- ($(ils)+(.2,.2)$)
+   node[sloped,above, near end] {Margin};
+
+\foreach \Point in {(.9,2.4), (1.3,2.5), (1.3,2.1), (2,3), (1,2.9)}{
+  \draw \Point node[leftNode]{};
+}
+
+\foreach \Point in {(2.9,1.4), (2.3,.5), (3.3,.1), (2,0.9), (2.5,1)}{
+  \draw \Point node[rightNode]{};
+}
+\end{tikzpicture}
