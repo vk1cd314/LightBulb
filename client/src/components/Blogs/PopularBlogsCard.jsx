@@ -1,46 +1,54 @@
 import { BiComment } from "react-icons/bi";
 import { FaThumbsUp } from "react-icons/fa6";
+import PropTypes from "prop-types";
+import { Link } from "react-router-dom";
 
-const PopularBlogsCard = () => {
+const PopularBlogsCard = ({ blog }) => {
     return (
-        <div className="flex flex-col min-h-fit w-full border-2 border-gray-200 p-5 rounded-lg">
-            <div className="flex items-center justify-between">
-                <div className="flex items-center">
+        <div className="flex flex-col justify-between min-h-fit w-full border-2 border-gray-200 p-5 rounded-lg">
+            <Link to={`/profile/${blog.user._id}`}>
+                <div className="flex">
                     <img
-                        className="rounded-full size-8"
-                        src="https://randomuser.me/api/portraits"
+                        className="rounded-full size-12"
+                        src={blog.user.profilepic}
                     />
                     <div className="ml-3">
-                        <h1 className="font-bold">John Doe</h1>
-                        <p className="text-gray-500">2 hours ago</p>
+                        <h1 className="font-bold text-start">{blog.user.name}</h1>
+                        <p className="text-gray-500">{blog.blog.created_at}</p>
                     </div>
                 </div>
-            </div>
+            </Link>
             {/* blog title */}
-            <h1 className="font-bold text-xl text-start my-2">
-                {"Blog title".substring(0, 80)}
-            </h1>
-            {/* read more */}
-            <p className="text-gray-500 text-start">
-                {"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec est ut felis consectetur euismod. Nulla facilisi. Nullam nec est ut felis consectetur euismod. Nulla facilisi. Nullam nec est ut felis consectetur euismod. Nulla facilisi.".substring(
-                    0,
-                    80
-                )}
-                ...
-            </p>
+            <Link to={`/b/${blog.blog._id}`}>
+                <h1 className="font-bold text-xl text-start my-2">
+                    {`${blog.blog.title}`.substring(0, 24)}...
+                </h1>
+                {/* read more */}
+                {/* dangerouslysetinner html */}
+                <p
+                    className="text-start"
+                    dangerouslySetInnerHTML={{
+                        __html: `${blog.blog.content}`
+                    }}
+                ></p>
+            </Link>
             {/* likes and comments */}
             <div className="flex items-center">
                 <div className="flex items-center mr-5">
                     <BiComment className="mr-1" />
-                    <p>12</p>
+                    <p>{blog.blog.comments.length}</p>
                 </div>
                 <div className="flex items-center">
                     <FaThumbsUp className="mr-1" />
-                    <p>3</p>
+                    <p>{blog.blog.likes.length}</p>
                 </div>
             </div>
         </div>
     );
+};
+
+PopularBlogsCard.propTypes = {
+    blog: PropTypes.object.isRequired,
 };
 
 export default PopularBlogsCard;

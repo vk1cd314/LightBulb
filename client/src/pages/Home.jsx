@@ -9,6 +9,10 @@ const Home = () => {
 
     useEffect(() => {
         // fetch the top 3 blogs from the API
+        axiosSecure.get(`/blogs/123/trending`).then((res) => {
+            setPopularBlogs(res.data);
+            console.log(res.data);
+        });
        
     }, []);
 
@@ -56,9 +60,9 @@ const Home = () => {
                 </p>
                 <div className="flex justify-center gap-10 mt-10">
                     {/* pass the top 3 blogs as props */}
-                    <PopularBlogsCard />
-                    <PopularBlogsCard />
-                    <PopularBlogsCard />
+                    {popularBlogs.map((blog) => (
+                        <PopularBlogsCard key={blog.blog._id} blog={blog} />
+                    ))}
                 </div>
             </div>
             {/* features */}

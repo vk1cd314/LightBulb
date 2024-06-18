@@ -1,7 +1,8 @@
 import { Link, Outlet } from "react-router-dom";
-import { createContext } from "react";
+import { createContext, useCallback, useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import Navbar from "../components/Shared/Navbar";
+import { IoIosArrowUp } from "react-icons/io";
 
 const MessageContext = createContext();
 
@@ -39,6 +40,27 @@ const Root = () => {
         notifyError,
     };
 
+    const [showScroll, setShowScroll] = useState(false);
+
+    const checkScrollTop = useCallback(() => {
+        if (!showScroll && window.pageYOffset > 400) {
+            setShowScroll(true);
+        } else if (showScroll && window.pageYOffset <= 400) {
+            setShowScroll(false);
+        }
+    }, [showScroll]);
+
+    useEffect(() => {
+        window.addEventListener("scroll", checkScrollTop);
+        return () => {
+            window.removeEventListener("scroll", checkScrollTop);
+        };
+    }, [checkScrollTop]);
+
+    const scrollTop = () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
     return (
         <>
             <MessageContext.Provider value={messageInfo}>
@@ -60,6 +82,15 @@ const Root = () => {
                     </Link>
                 </div>
             </div>
+            {/* scroll up button */}
+            {showScroll && (
+                <div
+                    className="fixed bottom-5 right-5 bg-accent text-white p-2 rounded-full cursor-pointer animate__animated animate__fadeInRight"
+                    onClick={scrollTop}
+                >
+                    <IoIosArrowUp className="text-2xl" />
+                </div>
+            )}
 
             <Toaster position="top-right" reverseOrder={false} />
         </>
