@@ -60,16 +60,14 @@ const CreateBlog = () => {
                         base64Images[index] = base64Image;
                         processedCount++;
     
-                        // If all images have been processed, perform the replacement
                         if (processedCount === tikzPictures.length) {
                             base64Images.forEach((image, i) => {
                                 updatedContent = updatedContent.replace(
-                                    tikzPictures[i],
+                                    `<pre><code>${tikzPictures[i]}</code></pre>`,
                                     `<img src="data:image/png;base64,${image}" />`
                                 );
                             });
     
-                            // Set the preview state to display the updated content
                             setPreview(renderLatex(updatedContent));
                             callback();
                         }
@@ -78,16 +76,14 @@ const CreateBlog = () => {
                         console.error("Error fetching image:", error);
                         processedCount++;
     
-                        // If all images have been processed, even with errors, perform the replacement
                         if (processedCount === tikzPictures.length) {
                             base64Images.forEach((image, i) => {
                                 updatedContent = updatedContent.replace(
-                                    tikzPictures[i],
+                                    `<pre><code>${tikzPictures[i]}</code></pre>`,
                                     `<img src="data:image/png;base64,${image || ''}" />`
                                 );
                             });
     
-                            // Set the preview state to display the updated content
                             setPreview(renderLatex(updatedContent));
                             callback();
                         }
