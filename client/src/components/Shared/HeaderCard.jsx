@@ -76,7 +76,7 @@ HeaderCard.propTypes = {
     comments: PropTypes.array.isRequired,
     authorProfilePic: PropTypes.string.isRequired,
     authorid: PropTypes.string.isRequired,
-    handleDelete: PropTypes.func.isRequired,
+    handleDelete: PropTypes.func,
 };
 
 export default HeaderCard;
