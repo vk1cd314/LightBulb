@@ -12,7 +12,7 @@ import PrivateRoute from "./Auth/PrivateRoute";
 import Settings from "./pages/Settings";
 import Profile from "./pages/Profile";
 import Communities from "./pages/Communities";
-import CreateCommunity from './components/Communities/CreateCommunity';
+import CreateCommunity from "./components/Communities/CreateCommunity";
 import Blogs from "./pages/Blogs";
 import ExploreCommunities from "./components/Communities/ExploreCommunities";
 import MyCommunities from "./components/Communities/MyCommunities";
@@ -25,6 +25,7 @@ import CommunityPage from "./pages/CommunityPage";
 import PostPage from "./pages/PostPage";
 import UserProfiles from "./pages/UserProfiles";
 import Drafts from "./pages/Drafts";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const router = createBrowserRouter([
     {
@@ -46,9 +47,11 @@ const router = createBrowserRouter([
             },
             {
                 path: "/blogs",
-                element: <PrivateRoute>
-                    <Blogs></Blogs>
-                </PrivateRoute>,
+                element: (
+                    <PrivateRoute>
+                        <Blogs></Blogs>
+                    </PrivateRoute>
+                ),
                 children: [
                     {
                         path: "/blogs/explore",
@@ -57,50 +60,66 @@ const router = createBrowserRouter([
                     {
                         path: "/blogs/my-blogs",
                         element: <AllBlogsCards></AllBlogsCards>,
-                    }
-                ]
+                    },
+                ],
             },
             {
                 path: "/blog/create",
-                element: <PrivateRoute>
-                    <CreateBlog></CreateBlog>
-                </PrivateRoute>,
+                element: (
+                    <PrivateRoute>
+                        <CreateBlog></CreateBlog>
+                    </PrivateRoute>
+                ),
             },
             {
                 path: "/b/:id",
-                element: <PrivateRoute>
-                    <BlogPage></BlogPage>
-                </PrivateRoute>,
+                element: (
+                    <PrivateRoute>
+                        <BlogPage></BlogPage>
+                    </PrivateRoute>
+                ),
             },
             {
                 path: "/communities",
-                element: <PrivateRoute>
-                    <Communities />
-                </PrivateRoute>,
+                element: (
+                    <PrivateRoute>
+                        <Communities />
+                    </PrivateRoute>
+                ),
                 children: [
                     {
                         path: "/communities/explore",
-                        element: <PrivateRoute>
-                            <ExploreCommunities />
-                        </PrivateRoute>,
+                        element: (
+                            <PrivateRoute>
+                                <ExploreCommunities />
+                            </PrivateRoute>
+                        ),
                     },
                     {
                         path: "/communities/my-communities",
-                        element: <PrivateRoute><MyCommunities/></PrivateRoute>,
+                        element: (
+                            <PrivateRoute>
+                                <MyCommunities />
+                            </PrivateRoute>
+                        ),
                     },
                 ],
             },
             {
                 path: "/community/:id/create",
-                element: <PrivateRoute>
-                    <CreateBlog />
-                </PrivateRoute>,
+                element: (
+                    <PrivateRoute>
+                        <CreateBlog />
+                    </PrivateRoute>
+                ),
             },
             {
                 path: "/community/:id",
-                element: <PrivateRoute>
-                    <CommunityPage />
-                </PrivateRoute>,
+                element: (
+                    <PrivateRoute>
+                        <CommunityPage />
+                    </PrivateRoute>
+                ),
             },
             {
                 path: "/settings",
@@ -112,38 +131,64 @@ const router = createBrowserRouter([
             },
             {
                 path: "/profile",
-                element: <PrivateRoute><Profile /></PrivateRoute>,
+                element: (
+                    <PrivateRoute>
+                        <Profile />
+                    </PrivateRoute>
+                ),
             },
             {
                 path: "/profile/:id",
-                element: <PrivateRoute>
-                    <UserProfiles />
-                </PrivateRoute>,
+                element: (
+                    <PrivateRoute>
+                        <UserProfiles />
+                    </PrivateRoute>
+                ),
             },
             {
                 path: "/create-community",
-                element: <PrivateRoute><CreateCommunity /></PrivateRoute>,
+                element: (
+                    <PrivateRoute>
+                        <CreateCommunity />
+                    </PrivateRoute>
+                ),
             },
             {
                 path: "/create-post",
-                element: <PrivateRoute><CreatePost/></PrivateRoute>,
+                element: (
+                    <PrivateRoute>
+                        <CreatePost />
+                    </PrivateRoute>
+                ),
             },
             {
                 path: "drafts",
-                element: <PrivateRoute><Drafts/></PrivateRoute>,
+                element: (
+                    <PrivateRoute>
+                        <Drafts />
+                    </PrivateRoute>
+                ),
             },
             {
                 path: "drafts/:id/edit",
-                element: <PrivateRoute><CreateBlog/></PrivateRoute>,
-            }
+                element: (
+                    <PrivateRoute>
+                        <CreateBlog />
+                    </PrivateRoute>
+                ),
+            },
         ],
     },
 ]);
 
+const queryClient = new QueryClient();
+
 ReactDOM.createRoot(document.getElementById("root")).render(
     <React.StrictMode>
-        <AuthProvider>
-            <RouterProvider router={router} />
-        </AuthProvider>
+        <QueryClientProvider client={queryClient}>
+            <AuthProvider>
+                <RouterProvider router={router} />
+            </AuthProvider>
+        </QueryClientProvider>
     </React.StrictMode>
 );

@@ -2,19 +2,30 @@ import { Link } from "react-router-dom";
 import PopularBlogsCard from "../components/Blogs/PopularBlogsCard";
 import { useEffect, useState } from "react";
 import useAxiosSecure from './../hooks/useAxiosSecure';
+import { useQuery } from "@tanstack/react-query";
+import Loader from "../components/FunctionalComponents/Loader";
 
 const Home = () => {
     const [popularBlogs, setPopularBlogs] = useState([]);
     const axiosSecure = useAxiosSecure();
 
+    const popularBlogsQuery = useQuery({
+        queryKey: ["popularBlogs"],
+        queryFn: async () => {
+            const { data } = await axiosSecure.get("/blogs/123/trending");
+            return data;
+        }
+    });
+
     useEffect(() => {
-        // fetch the top 3 blogs from the API
-        axiosSecure.get(`/blogs/123/trending`).then((res) => {
-            setPopularBlogs(res.data);
-            console.log(res.data);
-        });
-       
-    }, []);
+        if (popularBlogsQuery.isSuccess) {
+            setPopularBlogs(popularBlogsQuery.data);
+        }
+    }, [popularBlogsQuery.isSuccess, popularBlogsQuery.data]);
+
+    if (popularBlogsQuery.isLoading) {
+        return <Loader />;
+    }
 
 
     return (
