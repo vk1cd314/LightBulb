@@ -6,23 +6,18 @@ import useAxiosSecure from "../hooks/useAxiosSecure";
 import Communities from "./Communities";
 import Loader from "../components/FunctionalComponents/Loader";
 import SearchBar from "../components/Shared/SearchBar";
+import { useQuery } from "@tanstack/react-query";
 
 const Profile = () => {
     const { userInfo } = useContext(AuthContext);
     const axiosSecure = useAxiosSecure();
-    const [profileData, setProfileData] = useState({});
-    const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        setLoading(true);
-        axiosSecure.get(`/users/${userInfo._id}/userdata`).then((response) => {
-            setProfileData(response.data);
-        }).finally(() => {
-            setLoading(false);
-        });
-    }, []);
+    const { data: profileData, isLoading } = useQuery({
+        queryKey: ["userData", userInfo._id],
+        queryFn: () => axiosSecure.get(`/users/${userInfo._id}/userdata`).then(res => res.data),
+    });
 
-    if (loading) {
+    if (isLoading) {
         return <Loader/>;
     }
 

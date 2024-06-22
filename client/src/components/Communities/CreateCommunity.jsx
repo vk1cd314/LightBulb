@@ -5,6 +5,7 @@ import useAxiosSecure from "../../hooks/useAxiosSecure";
 import { AuthContext } from "../../Auth/AuthProvider";
 import { MessageContext} from "../../pages/Root"
 import { useNavigate } from "react-router-dom";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const CreateCommunity = () => {
     const [communityName, setCommunityName] = useState("");
@@ -13,6 +14,21 @@ const CreateCommunity = () => {
     const { userInfo } = useContext(AuthContext);
     const {notifySuccess, notifyError} = useContext(MessageContext);
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
+
+    const createCommnunityMutation = useMutation({
+        mutationFn: (communityDetails) => axiosSecure.post("/communities", communityDetails),
+        onSuccess: (data) => {
+            queryClient.invalidateQueries(["explorecommunities"]);
+            queryClient.invalidateQueries(["mycommunities"]);
+            queryClient.invalidateQueries(["community", data.data._id]);
+            notifySuccess("Community created successfully");
+            navigate(`/community/${data.data._id}`);
+        },
+        onError: () => {
+            notifyError("Error creating community");
+        },
+    });
 
     const handleSubmit = () => {
         const communityDetails = {
@@ -26,14 +42,7 @@ const CreateCommunity = () => {
             return;
         }   
 
-        axiosSecure.post("/communities", communityDetails).then((res) => {
-            console.log(res);
-            notifySuccess("Community created successfully");
-            navigate(`/community/${res.data._id}`);
-        }).catch((err) => {
-            console.log(err);
-            notifyError("Error creating community");
-        });
+        createCommnunityMutation.mutate(communityDetails);
     };
 
     return (

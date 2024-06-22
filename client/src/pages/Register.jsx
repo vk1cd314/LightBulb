@@ -6,6 +6,7 @@ import PasswordInput from "../components/FunctionalComponents/PasswordInput";
 import Loader from "../components/FunctionalComponents/Loader";
 import { FcGoogle } from "react-icons/fc";
 import useAxiosSecure from "../hooks/useAxiosSecure";
+import { useMutation } from "@tanstack/react-query";
 
 const Register = () => {
     const {
@@ -25,6 +26,14 @@ const Register = () => {
     const [confirmation, setConfirmation] = useState("");
 
     const axiosSecure = useAxiosSecure();
+
+    const loginMutation = useMutation({
+        mutationFn: (data) => axiosSecure.post("/users/", data),
+        onSuccess: (response) => {
+            setUserInfo(response.data);
+            navigate(location?.state ? location.state : "/");
+        }
+    });
 
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -86,14 +95,8 @@ const Register = () => {
             profilepic: "https://i.ibb.co/hYbbGyR/6596121-modified.png",
         };
 
-        axiosSecure
-            .post("/users/", user)
-            .then((response) => {
-                console.log(response);
-            })
-            .catch((error) => {
-                console.error(error);
-            });
+        // Call the login mutation to post to backend
+        loginMutation.mutate(user);
 
         await updateUserProfile(
             user,
@@ -129,19 +132,11 @@ const Register = () => {
                 profilepic: user.photoURL || "https://i.ibb.co/hYbbGyR/6596121-modified.png",
             };
     
-            // Post the user to the backend
-            axiosSecure
-                .post("/users/", newUser)
-                .then((response) => {
-                    setUserInfo(response.data);
-                })
-                .catch((error) => {
-                    console.error(error);
-                });
+            // Call the login mutation to post to backend
+            loginMutation.mutate(newUser);
     
             if (!loading) {
                 notifySuccess("Logged in successfully");
-                navigate(location?.state ? location.state : "/");
             }
         } catch (error) {
             notifyError("An error occurred. Please try again later.");
