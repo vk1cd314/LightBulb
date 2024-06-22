@@ -3,33 +3,39 @@ import { IoSearchOutline } from "react-icons/io5";
 import PropTypes from "prop-types";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import { Link, useLocation } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 
 const SearchBar = () => {
     const axiosSecure = useAxiosSecure();
     const [searchParam, setSearchParam] = useState("");
     const searchRef = useRef(null);
-    const [blogs, setBlogs] = useState([]);
-    const [users, setUsers] = useState([]);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
     const location = useLocation();
 
+    const isProfileSearch = location.pathname.includes("/profile");
+
+    const { data: searchResults, refetch } = useQuery({
+        queryKey: ["search", searchParam, isProfileSearch],
+        queryFn: () => {
+            if (searchParam.trim() === "") return { blogs: [], users: [] };
+            if (isProfileSearch) {
+                return axiosSecure
+                    .get(`/users/search/${searchParam}`)
+                    .then((response) => ({ users: response.data, blogs: [] }));
+            } else {
+                return axiosSecure
+                    .get(`/blogs/search/${searchParam}`)
+                    .then((response) => ({ blogs: response.data, users: [] }));
+            }
+        },
+        enabled: false,
+    });
+
     const handleSearch = () => {
-        if (!location.pathname.includes("/profile")) {
-            axiosSecure.get(`/blogs/search/${searchParam}`).then((response) => {
-                setBlogs(response.data);
-                setIsDropdownOpen(true);
-            });
-        } else {
-            axiosSecure.get(`/users/search/${searchParam}`).then((response) => {
-                setUsers(response.data);
-                console.log(response.data);
-                setIsDropdownOpen(true);
-            });
+        if (searchParam.trim() !== "") {
+            refetch();
+            setIsDropdownOpen(true);
         }
-        // clear search bar
-        setBlogs([]);
-        setUsers([]);
     };
 
     const handleClickOutside = (event) => {
@@ -52,11 +58,7 @@ const SearchBar = () => {
         >
             <input
                 type="text"
-                placeholder={
-                    location.pathname.includes("/profile")
-                        ? "Search users"
-                        : "Search blogs"
-                }
+                placeholder={isProfileSearch ? "Search users" : "Search blogs"}
                 className="p-2 rounded-lg bg-gray-100 text-primary border-2 border-primary"
                 value={searchParam}
                 onChange={(e) => setSearchParam(e.target.value)}
@@ -67,46 +69,41 @@ const SearchBar = () => {
             >
                 <IoSearchOutline />
             </button>
-            {isDropdownOpen && (
+            {isDropdownOpen && searchResults && (
                 <div className="absolute flex flex-col border border-gray-300 top-full left-0 w-full bg-white shadow-lg rounded-lg mt-2">
-                    {blogs.length > 0
-                        ? blogs.map((result) => (
-                              <>
-                                  <Link
-                                      to={`/b/${result._id}`}
-                                      key={result._id}
-                                      className="p-2 hover:bg-gray-100 rounded-lg"
-                                  >
-                                      {result.title}
-                                  </Link>
-                                  <hr />
-                              </>
-                          ))
-                        : ""}
-                    {users.length > 0
-                        ? users.map((result) => (
-                              <>
-                                  <Link
-                                      to={`/profile/${result._id}`}
-                                      key={result._id}
-                                      className="p-2 hover:bg-gray-100 rounded-lg flex items-center gap-2"
-                                  >
-                                      <img
-                                          src={result.profilepic}
-                                          className="rounded-full size-12"
-                                      />
-                                      {result.name}
-                                  </Link>
-                                  <hr />
-                              </>
-                          ))
-                        : ""}
-                        {
-                            blogs.length === 0 && users.length === 0 && (
-                                <div className="p-2">No results found</div>
-                            )
-                        
-                        }
+                    {searchResults.blogs &&
+                        searchResults.blogs.map((result) => (
+                            <Link
+                                to={`/b/${result._id}`}
+                                key={result._id}
+                                className="p-2 hover:bg-gray-100 rounded-lg"
+                            >
+                                {result.title}
+                                <hr />
+                            </Link>
+                        ))}
+                    {searchResults.users &&
+                        searchResults.users.map((result) => (
+                            <Link
+                                to={`/profile/${result._id}`}
+                                key={result._id}
+                                className="p-2 hover:bg-gray-100 rounded-lg flex items-center gap-2"
+                            >
+                                <img
+                                    src={result.profilepic}
+                                    className="rounded-full size-12"
+                                    alt={result.name}
+                                />
+                                {result.name}
+                                <hr />
+                            </Link>
+                        ))}
+                    {(!searchResults.blogs ||
+                        searchResults.blogs.length === 0) &&
+                        (!searchResults.users ||
+                            searchResults.users.length === 0) && (
+                            <div className="p-2">No results found</div>
+                        )}
                 </div>
             )}
         </div>
