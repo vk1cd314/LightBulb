@@ -1,61 +1,40 @@
 import { useContext, useEffect, useState } from "react";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import CommunitiesCard from "../Shared/CommunitiesCard";
-import Loader from "../FunctionalComponents/Loader";
 import { MessageContext } from "../../pages/Root";
+import { useMutation, useQuery } from "@tanstack/react-query";
 const ExploreCommunities = () => {
     const axiosSecure = useAxiosSecure();
-    const [communities, setCommunities] = useState([]);
-    const [loading, setLoading] = useState(true);
     const { notifyError, notifySuccess } = useContext(MessageContext);
 
-    useEffect(() => {
-        setLoading(true);
-        axiosSecure
-            .get("/communities")
-            .then((res) => {
-                console.log(res.data);
-                setCommunities(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
-    }, []);
-
-    const handleJoin = (community, userInfo) => {
-        // /communities/667139a3122e0584a471f4e1/join?user_id=666f4f7c0ff501da0bfeb624
-        console.log("Joining community");
-        console.log(`/communities/${community._id}/${userInfo._id}/join`);
-        axiosSecure
-            .put(`/communities/${community._id}/${userInfo._id}/join`)
-            .then((res) => {
-                console.log(res.data);
-                notifySuccess("Joined community successfully");
-                setLoading(true);
-                // Fetch communities again
-                axiosSecure
-                    .get("/communities")
-                    .then((res) => {
-                        console.log(res.data);
-                        setCommunities(res.data);
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                    })
-                    .finally(() => {
-                        setLoading(false);
-                    });
-            })
-            .catch((err) => {
-                console.log(err);
-                notifyError("Error joining community");
-            });
+    const fetchCommunities = async () => {
+        const { data } = await axiosSecure.get("/communities");
+        return data;
     };
 
-    if (loading) {
+    const { data: communities, isLoading, refetch } = useQuery({
+        queryKey: ["explorecommunities"],
+        queryFn: fetchCommunities,
+    });
+
+    const joinMutation = useMutation({
+        mutationFn: ({ communityId, userId }) =>
+            axiosSecure.put(`/communities/${communityId}/${userId}/join`),
+        onSuccess: () => {
+            notifySuccess("Joined community successfully");
+            refetch();
+        },
+        onError: () => {
+            notifyError("Error joining community");
+        },
+    });
+    
+    const handleJoin = (community, userInfo) => {
+        joinMutation.mutate({ communityId: community._id, userId: userInfo._id });
+    };
+    
+
+    if (isLoading) {
         return (
             <div className="flex justify-center items-center mt-10">
                 <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
