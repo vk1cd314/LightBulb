@@ -26,14 +26,17 @@ const UserProfiles = () => {
 
     const { data: followingStatus, isLoading: isFollowingStatusLoading } = useQuery({
         queryKey: ["followingStatus", currentUser._id, userId],
-        queryFn: () => axiosSecure.get(`/users/followingtype`, {
+        queryFn: () => axiosSecure.post(`/users/followingtype`, {
             uid1: currentUser._id,
             uid2: userId,
-        }).then(res => res.data.details),
+        }).then(res => res.data.details === "true"),
     });
 
     const followMutation = useMutation({
-        mutationFn: () => axiosSecure.post(`/users/follow`, { uid1: currentUser._id, uid2: userId }),
+        mutationFn: () => axiosSecure.post(`/users/follow`, {
+            uid1: currentUser._id,
+            uid2: userId,
+        }),
         onSuccess: (response) => {
             const isNowFollowing = response.data.detail !== "Successfully unfollowed";
             queryClient.setQueryData(["followingStatus", currentUser._id, userId], isNowFollowing);
