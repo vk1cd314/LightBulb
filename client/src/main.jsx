@@ -22,7 +22,6 @@ import AllBlogsCards from "./components/Blogs/AllBlogsCards";
 import Home from "./pages/Home";
 import BlogPage from "./pages/BlogPage";
 import CommunityPage from "./pages/CommunityPage";
-import PostPage from "./pages/PostPage";
 import UserProfiles from "./pages/UserProfiles";
 import Drafts from "./pages/Drafts";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
