@@ -6,13 +6,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Loader from "../components/FunctionalComponents/Loader";
 
 const Settings = () => {
-    const { user, setUserInfo } = useContext(AuthContext);
+    const { user, setUserInfo, userInfo: currentInfo } = useContext(AuthContext);
     const { notifySuccess, notifyError } = useContext(MessageContext); //use to notify user of success or error
     const queryClient = useQueryClient();
     const axiosSecure = useAxiosSecure();
 
     const {data: userInfo, refetch, isLoading} = useQuery({
-        queryKey: ["user"],
+        queryKey: ["userData", currentInfo._id],
         queryFn: () => axiosSecure.get("/users/email/?email=" + user.email).then(res => res.data),
     });
 
