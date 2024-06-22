@@ -2,12 +2,35 @@ import { useContext } from "react";
 import { AuthContext } from "../Auth/AuthProvider";
 import { MessageContext } from "./Root";
 import useAxiosSecure from "../hooks/useAxiosSecure";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import Loader from "../components/FunctionalComponents/Loader";
 
 const Settings = () => {
-    const { user, userInfo, setUserInfo } = useContext(AuthContext);
+    const { user, setUserInfo } = useContext(AuthContext);
     const { notifySuccess, notifyError } = useContext(MessageContext); //use to notify user of success or error
-
+    const queryClient = useQueryClient();
     const axiosSecure = useAxiosSecure();
+
+    const {data: userInfo, refetch, isLoading} = useQuery({
+        queryKey: ["user"],
+        queryFn: () => axiosSecure.get("/users/email/?email=" + user.email).then(res => res.data),
+    });
+
+    const infoMutate = useMutation({
+        mutationFn: (data) => axiosSecure.put("/users/" + userInfo._id, data),
+        onSuccess: (data) => {
+            setUserInfo(data);
+            queryClient.invalidateQueries(["user"]);
+            notifySuccess("Profile updated successfully");
+        },
+        onError: () => {
+            notifyError("An error occurred. Please try again later.");
+        },
+    });
+
+    if (isLoading) {
+        return <Loader />;
+    }
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -32,17 +55,7 @@ const Settings = () => {
 
         console.log(newUserInfo);
 
-        axiosSecure
-            .put("/users/" + userInfo._id, newUserInfo)
-            .then((response) => {
-                console.log(response.data);
-                setUserInfo(response.data);
-                notifySuccess("Profile updated successfully");
-            })
-            .catch((error) => {
-                console.log(error);
-                notifyError("An error occurred. Please try again later.");
-            });
+        infoMutate.mutate(newUserInfo);
 
         //reset form
         e.target.reset();
@@ -70,7 +83,7 @@ const Settings = () => {
                             <select
                                 className="border border-gray-200 px-3 py-2 rounded-lg"
                                 name="gender"
-                                defaultValue={userInfo.gender || ""}
+                                defaultValue={userInfo?.gender || ""}
                             >
                                 <option value="" disabled>
                                     Select your gender
