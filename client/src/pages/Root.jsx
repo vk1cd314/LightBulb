@@ -3,6 +3,7 @@ import { createContext, useCallback, useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import Navbar from "../components/Shared/Navbar";
 import { IoIosArrowUp } from "react-icons/io";
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 const MessageContext = createContext();
 
@@ -93,6 +94,7 @@ const Root = () => {
             )}
 
             <Toaster position="top-right" reverseOrder={false} />
+            <ReactQueryDevtools initialIsOpen={false} />
         </>
     );
 };

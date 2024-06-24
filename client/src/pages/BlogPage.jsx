@@ -6,72 +6,94 @@ import { useContext, useEffect, useState } from "react";
 import useAxiosSecure from "../hooks/useAxiosSecure";
 import { AuthContext } from "../Auth/AuthProvider";
 
-import Loader from './../components/FunctionalComponents/Loader';
+import Loader from "./../components/FunctionalComponents/Loader";
 import { MessageContext } from "./Root";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const BlogPage = () => {
     const id = useParams().id;
 
     const axiosSecure = useAxiosSecure();
-
-    const [blogDetails, setBlogDetails] = useState({});
-    const [blogComments, setBlogComments] = useState([]);
     const { userInfo } = useContext(AuthContext);
     const [likes, setLikes] = useState(0);
     const [commentCount, setCommentCount] = useState(0);
     const { notifySuccess, notifyError } = useContext(MessageContext);
-    const [loading, setLoading] = useState(false);
+    const [isLikeDisabled, setIsLikeDisabled] = useState(false);
 
-    useEffect(() => {
-        // fetch blog
-        setLoading(true);
-        Promise.all([
-            axiosSecure.get(`/blogs/${id}/details`),
-            axiosSecure.get(`/blogs/${id}/commentlist`),
-        ])
-            .then(([detailsResponse, commentsResponse]) => {
-                console.log(detailsResponse.data);
-                setBlogDetails(detailsResponse.data);
-                setLikes(detailsResponse.data.blog.likes.length);
-                setCommentCount(detailsResponse.data.blog.comments.length);
+    const { data: blogDetails, isLoading: blogsLoading } = useQuery({
+        queryKey: ["blogDetails", id],
+        queryFn: () =>
+            axiosSecure.get(`/blogs/${id}/details`).then((res) => res.data),
+        enabled: true,
+        onSuccess: (data) => {
+            setLikes(data.blog.likes.length);
+            setCommentCount(data.blog.comments.length);
+        },
+    });
 
-                console.log(commentsResponse.data);
-                setBlogComments(commentsResponse.data);
-            })
-            .catch((error) => {
-                console.error(error);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
-    }, [id]);
+    const { data: blogComments } = useQuery({
+        queryKey: ["blogComments", id],
+        queryFn: () =>
+            axiosSecure.get(`/blogs/${id}/commentlist`).then((res) => res.data),
+        enabled: true,
+    });
+
+    const queryClient = useQueryClient();
+
+    const deleteLikeMutation = useMutation({
+        mutationFn: (data) => axiosSecure.delete(`/blogs/${id}/like`, data),
+        onMutate: () => {
+            setIsLikeDisabled(true);
+        },
+        onSuccess: (response) => {
+            setLikes(likes => likes - 1);
+            notifyError("Unliked the post");
+        },
+        onSettled: () => {
+            queryClient.invalidateQueries(["blogDetails", id]);
+            setIsLikeDisabled(false);
+        },
+    });
+
+
+    const likeMutation = useMutation({
+        mutationFn: (data) => axiosSecure.post(`/blogs/${id}/like`, data),
+        onMutate: () => {
+            setIsLikeDisabled(true);
+        },
+        onSuccess: (response) => {
+            if (response.data.details === "Already liked") {
+                axiosSecure.delete(`/blogs/${id}/like`, {
+                    data: {uid: userInfo._id, blogid: id},
+                    headers: { "Content-Type": "application/json" },
+                })
+                .then(() => {
+                    setLikes(likes => likes - 1);
+                    notifyError("Unliked the post");
+                })
+                .catch(() => {
+                    setLikes(likes => likes - 1);
+                    notifyError("Failed to unlike the post");
+                });
+            } else {
+                setLikes(likes => likes + 1);
+                notifySuccess("Liked the post");
+            }
+        },
+        onSettled: () => {
+            queryClient.invalidateQueries(["blogDetails", id]);
+            setIsLikeDisabled(false);
+        },
+    });
 
     const handleLike = () => {
+        if (isLikeDisabled) return;
+
         const blogLike = {
             uid: userInfo._id,
             blogid: id,
         };
-        axiosSecure
-            .post(`/blogs/${id}/like`, blogLike)
-            .then((response) => {
-                console.log(response.data);
-                // if already liked, delete like
-                if (response.data.details === "Already liked") {
-                    axiosSecure
-                        .delete(`/blogs/${id}/like`, {
-                            data: blogLike,
-                            headers: { "Content-Type": "application/json" },
-                        })
-                        .then((response) => {
-                            console.log(response.data);
-                            setLikes(likes - 1); // decrement likes
-                            notifyError("Unliked the post");
-                        });
-                } else {
-                    setLikes(likes + 1); // increment likes
-                    notifySuccess("Liked the post");
-                }
-            })
+        likeMutation.mutate(blogLike);
     };
 
     const [comment, setComment] = useState("");
@@ -86,7 +108,6 @@ const BlogPage = () => {
             uid: userInfo._id,
             blogid: id,
         };
-        setLoading(true);
         axiosSecure
             .post(`/blogs/${id}/comment`, commentData)
             .then((response) => {
@@ -95,23 +116,18 @@ const BlogPage = () => {
                 setCommentCount(commentCount + 1);
                 // refetch comments
                 return axiosSecure.get(`/blogs/${id}/commentlist`);
-
             })
-            .then((response) => {
-                setBlogComments(response.data);
-            })
+            .then((response) => {})
             .catch((error) => {
                 notifyError("Failed to post comment");
             })
-            .finally(() => {
-                setLoading(false);
-            });
-    
+            .finally(() => {});
+
         setComment("");
     };
 
-    if(loading){
-        return <Loader/>
+    if (blogsLoading) {
+        return <Loader />;
     }
 
     const handleDeleteComment = (comment) => {
@@ -134,9 +150,6 @@ const BlogPage = () => {
             .catch((error) => {
                 notifyError("Failed to delete comment");
             });
-        setBlogComments(
-            blogComments.filter((blogComment) => blogComment.comment._id !== comment._id)
-        );
     };
 
     return (
@@ -145,7 +158,10 @@ const BlogPage = () => {
                 <h1 className="text-4xl font-bold text-center mt-20">
                     {blogDetails?.blog?.title}
                 </h1>
-                <Link to={`/profile/${blogDetails?.blog?.uid}`} className="flex justify-center my-5">
+                <Link
+                    to={`/profile/${blogDetails?.blog?.uid}`}
+                    className="flex justify-center my-5"
+                >
                     <img
                         className="rounded-full size-12"
                         src={blogDetails?.user?.profilepic}
@@ -175,8 +191,13 @@ const BlogPage = () => {
                     </div>
                     <div className="flex items-center">
                         <FaThumbsUp
-                            className="mr-1 text-xl"
+                            className={`mr-1 text-xl ${
+                                isLikeDisabled
+                                    ? "opacity-50 cursor-not-allowed"
+                                    : "cursor-pointer"
+                            }`}
                             onClick={handleLike}
+                            disabled={isLikeDisabled}
                         />
                         <p>{likes}</p>
                     </div>
@@ -203,15 +224,16 @@ const BlogPage = () => {
                         Post Comment
                     </button>
                 </div>
-                {blogComments.map((comment) => {
-                    return (
-                        <CommentBox
-                            key={comment.comment._id}
-                            comment={comment}
-                            handleDeleteComment={handleDeleteComment}
-                        />
-                    );
-                })}
+                {blogComments &&
+                    blogComments.map((comment) => {
+                        return (
+                            <CommentBox
+                                key={comment.comment._id}
+                                comment={comment}
+                                handleDeleteComment={handleDeleteComment}
+                            />
+                        );
+                    })}
             </div>
         </>
     );
