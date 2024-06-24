@@ -58,10 +58,8 @@ Welcome to **LightBulb**, your go-to platform for discovering the latest insight
    ```
 
 ### Usage
-- Open your browser and navigate to `http://localhost:5173` for the frontend.
+- Open your browser and navigate to `http://localhost:5173` or `http://localhost:5174` for the frontend.
 - The backend server runs on `http://localhost:8000`.
-
-Sure! Here's an updated conclusion with additional bullet points:
 
 ## Conclusion
 
