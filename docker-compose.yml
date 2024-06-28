@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/app:/app
+    env_file:
+      - .env
+    environment:
+      - ENV=development
+
+  frontend:
+    build: ./client
+    ports:
+      - "4173:4173"
+    depends_on:
+      - backend
