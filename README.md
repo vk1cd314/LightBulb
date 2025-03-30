@@ -24,6 +24,9 @@ Welcome to **LightBulb**, your go-to platform for discovering the latest insight
 ### Search Functionality
 - **Comprehensive Search:** A powerful search bar allows users to search for both blogs and other users within LightBulb.
 
+### Demo
+https://github.com/user-attachments/assets/acab0162-6ed5-4756-b5e1-4085b202adb0
+
 ## Technology Stack
 - **Frontend:** React, KaTeX for rendering LaTeX.
 - **Backend:** MongoDB, MiKTeX and pdflatex for converting LaTeX to PDFs and then to images, FastAPIs.
